@@ -1,0 +1,1661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>What Is a Blockchain?</title>
+<meta name="description" content="An interactive, plain-language explainer of how Bitcoin's blockchain works: hashes, blocks, mining and confirmations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  body{margin:0; padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+  [hidden]{display:none!important}
+  :root{
+    --paper:#EEF1E9;
+    --surface:#FBFCF7;
+    --surface-2:#E5ECE0;
+    --ink:#16221C;
+    --ink-soft:#57685C;
+    --rule:#C9D5C6;
+    --rule-strong:#A3B5A0;
+    --accent:#1C4E6E;
+    --accent-2:#4E86A8;
+    --accent-soft:#D7E5ED;
+    --valid:#2E7A50;
+    --invalid:#B23A29;
+    --invalid-soft:#F2DDD8;
+    --flip:#F6E2A8;
+    --track-small:.006em;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#101613;
+      --surface:#171F1A;
+      --surface-2:#1E2822;
+      --ink:#E5ECE3;
+      --ink-soft:#94A598;
+      --rule:#2B362F;
+      --rule-strong:#3E4C44;
+      --accent:#7FBEE0;
+      --accent-2:#4A87A8;
+      --accent-soft:#17303D;
+      --valid:#63BC84;
+      --invalid:#E4796A;
+      --invalid-soft:#33201C;
+      --flip:#5C4A18;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#101613;
+    --surface:#171F1A;
+    --surface-2:#1E2822;
+    --ink:#E5ECE3;
+    --ink-soft:#94A598;
+    --rule:#2B362F;
+    --rule-strong:#3E4C44;
+    --accent:#7FBEE0;
+    --accent-2:#4A87A8;
+    --accent-soft:#17303D;
+    --valid:#63BC84;
+    --invalid:#E4796A;
+    --invalid-soft:#33201C;
+    --flip:#5C4A18;
+    color-scheme: dark;
+  }
+
+  @media (prefers-contrast: more){
+    :root{
+      --paper:#F3F6EF; --surface:#FFFFFF; --surface-2:#E1E9DC;
+      --ink:#0B120E; --ink-soft:#26332B;
+      --rule:#8FA08C; --rule-strong:#526351;
+      --accent:#0F3A55; --accent-2:#2E6483; --accent-soft:#CCE0EC;
+      --valid:#1E5E38; --invalid:#8E2418; --invalid-soft:#F7DCD6;
+    }
+  }
+  @media (prefers-contrast: more) and (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#070B09; --surface:#101613; --surface-2:#18211B;
+      --ink:#F4F8F2; --ink-soft:#C3D0C6;
+      --rule:#4A5A50; --rule-strong:#6E8076;
+      --accent:#A6D6F0; --accent-2:#6BA3C4; --accent-soft:#12303F;
+      --valid:#8FD9A8; --invalid:#FF9C8C; --invalid-soft:#3A1F1A;
+    }
+  }
+  @media (prefers-contrast: more){
+    :root[data-theme="dark"]{
+      --paper:#070B09; --surface:#101613; --surface-2:#18211B;
+      --ink:#F4F8F2; --ink-soft:#C3D0C6;
+      --rule:#4A5A50; --rule-strong:#6E8076;
+      --accent:#A6D6F0; --accent-2:#6BA3C4; --accent-soft:#12303F;
+      --valid:#8FD9A8; --invalid:#FF9C8C; --invalid-soft:#3A1F1A;
+    }
+  }
+
+  *{box-sizing:border-box}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size:1.0625rem;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{
+    --gutter:clamp(16px, 4vw, 48px);
+    max-width:1080px;
+    margin-inline:auto;
+    padding-inline:var(--gutter);
+    padding-block:0 clamp(3rem,8vw,6rem);
+  }
+  @media (prefers-reduced-motion: no-preference){
+    :root{scroll-behavior:smooth}
+  }
+
+  a{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+
+  .mono{font-family:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace}
+
+  .eyebrow{
+    font-family:"IBM Plex Mono", ui-monospace, monospace;
+    font-size:.7rem; font-weight:500; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--ink-soft);
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead{padding-block:clamp(2.5rem,7vw,5rem) clamp(1.6rem,4vw,2.4rem)}
+  .masthead .rule-top{
+    border-top:2px solid var(--ink);
+    padding-top:.55rem;
+    display:flex; flex-wrap:wrap; gap:.4rem 1.4rem; justify-content:space-between;
+  }
+  h1{
+    font-family:"Fraunces","Iowan Old Style",Georgia,serif;
+    font-weight:700; font-optical-sizing:auto;
+    font-size:clamp(2.7rem, 8.5vw, 5rem);
+    line-height:.96; letter-spacing:-.025em;
+    text-wrap:balance; margin:clamp(1.2rem,3vw,2rem) 0 0;
+  }
+  h1 em{font-style:normal; color:var(--accent)}
+  .deck{font-size:clamp(1.08rem,2.2vw,1.3rem); line-height:1.55; max-width:44ch; margin:1.3rem 0 0}
+  .deck strong{font-weight:600}
+
+  .chips{display:flex; flex-wrap:wrap; gap:.5rem; margin-top:1.5rem; padding:0; list-style:none}
+  .chip{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    padding:.4rem .7rem; border:1px solid var(--rule-strong);
+    background:var(--surface); color:var(--ink-soft);
+  }
+
+  /* ---------- contents ---------- */
+  .index{
+    display:flex; flex-wrap:wrap;
+    border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    margin-top:clamp(1.6rem,4vw,2.4rem); padding-block:.35rem;
+  }
+  .index a{
+    flex:1 1 9.5rem; display:flex; gap:.5rem; align-items:baseline;
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; letter-spacing:.1em; text-transform:uppercase;
+    text-decoration:none; color:var(--ink); padding:.4rem .45rem;
+  }
+  .index a .n{color:var(--accent); font-weight:500}
+  .index a:hover{background:var(--surface-2)}
+  .index a[aria-current="true"]{background:var(--surface-2); box-shadow:inset 2px 0 0 var(--accent)}
+
+  /* ---------- section frame ---------- */
+  .section{
+    position:relative;
+    display:grid;
+    grid-template-columns:8.5rem minmax(0,1fr);
+    gap:clamp(1rem,3vw,2.5rem);
+    border-top:1px solid var(--rule);
+    padding-block:clamp(2.4rem,5.5vw,3.8rem);
+    scroll-margin-top:calc(env(safe-area-inset-top, 0px) + 1rem);
+  }
+  /* one unbroken column rule down the page, as on ledger paper */
+  @media (min-width:761px){
+    .section::before{
+      content:"";
+      position:absolute; top:0; bottom:0;
+      left:calc(8.5rem + clamp(1rem,3vw,2.5rem) / 2);
+      width:1px; background:var(--rule);
+    }
+  }
+  .folio{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.7rem; font-weight:500; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--ink-soft);
+    position:sticky; top:calc(env(safe-area-inset-top, 0px) + 1.5rem);
+    align-self:start; line-height:1.5;
+  }
+  .folio span{display:block; color:var(--accent)}
+  @media (max-width:760px){
+    .section{grid-template-columns:minmax(0,1fr); gap:.9rem}
+    .folio{position:static; display:flex; gap:.6rem}
+  }
+
+  h2{
+    font-family:"Fraunces","Iowan Old Style",Georgia,serif;
+    font-weight:700; font-optical-sizing:auto;
+    font-size:clamp(1.6rem,3.8vw,2.4rem);
+    line-height:1.1; letter-spacing:-.018em;
+    text-wrap:balance; margin:0 0 .8rem;
+  }
+  h3{font-size:.95rem; font-weight:600; margin:0 0 .35rem}
+  p{margin:0 0 1rem; max-width:64ch}
+  p:last-child{margin-bottom:0}
+  .lede{font-size:1.1rem; max-width:58ch}
+
+  .stack{display:flex; flex-direction:column; gap:clamp(1.4rem,3vw,2rem)}
+
+  figcaption, .gloss dd, .col li, .steps p, .rows .v p, .record dd .note, .node .tip{
+    letter-spacing:var(--track-small);
+  }
+
+  /* ---------- ledger rows + glyphs ---------- */
+  .rows{list-style:none; margin:0; padding:0; display:flex; flex-direction:column}
+  .rows li{
+    display:grid; grid-template-columns:2.9rem minmax(0,1fr);
+    gap:.2rem 1.1rem;
+    border-bottom:1px solid var(--rule); padding-block:.95rem;
+  }
+  .rows li:first-child{border-top:1px solid var(--rule)}
+  .rows .k{display:flex; flex-direction:column; align-items:center; gap:.3rem; padding-top:.2rem}
+  .rows .k .num{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; letter-spacing:.12em; color:var(--accent);
+  }
+  .glyph{width:28px; height:28px; display:block; color:var(--ink-soft)}
+  .glyph *{fill:none; stroke:currentColor; stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round}
+  .rows .v p{margin:0; font-size:.98rem; color:var(--ink-soft)}
+  .rows .v h3{margin-bottom:.15rem}
+
+  /* ---------- block record ---------- */
+  .record{background:var(--surface); border:1px solid var(--rule-strong); border-top:3px solid var(--ink)}
+  .record-head{
+    display:flex; flex-wrap:wrap; justify-content:space-between; gap:.3rem 1rem;
+    padding:.75rem clamp(.8rem,2.5vw,1.2rem);
+    border-bottom:1px solid var(--rule); background:var(--surface-2);
+  }
+  .record-head b{font-family:"IBM Plex Mono", monospace; font-size:.82rem; font-weight:600; letter-spacing:.06em}
+  .record dl{margin:0; padding:0 clamp(.8rem,2.5vw,1.2rem)}
+  .record .fld{
+    display:grid; grid-template-columns:9.5rem minmax(0,1fr);
+    gap:.15rem 1rem; padding-block:.7rem; border-bottom:1px solid var(--rule);
+  }
+  .record .fld:last-child{border-bottom:0}
+  .record dt{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.7rem; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); padding-top:.15rem;
+  }
+  .record dd{margin:0; font-family:"IBM Plex Mono", monospace; font-size:.82rem; overflow-wrap:anywhere}
+  .record dd .note{
+    display:block; font-family:"IBM Plex Sans", sans-serif;
+    font-size:.82rem; color:var(--ink-soft); margin-top:.2rem;
+  }
+  .record dd .zeros{color:var(--valid); font-weight:600}
+  @media (max-width:560px){ .record .fld{grid-template-columns:1fr; gap:.25rem} }
+
+  /* ---------- hash lab ---------- */
+  .lab{
+    background:var(--surface); border:1px solid var(--rule-strong);
+    padding:clamp(1rem,3vw,1.5rem);
+    display:flex; flex-direction:column; gap:.7rem;
+  }
+  .lab label, .lab .flabel, .miner .flabel{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft);
+    display:flex; flex-wrap:wrap; gap:.2rem .8rem; justify-content:space-between;
+  }
+  .lab-row{display:flex; flex-wrap:wrap; gap:.5rem}
+  .lab input{
+    flex:1 1 12rem;
+    font-family:"IBM Plex Mono", monospace; font-size:1rem;
+    padding:.6rem .7rem; color:var(--ink); background:var(--paper);
+    border:1px solid var(--rule-strong); border-radius:0;
+  }
+  .lab input:focus{outline:none; border-color:var(--accent); box-shadow:inset 0 0 0 1px var(--accent)}
+  .lab input:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .btn{
+    font-family:"IBM Plex Mono", monospace;
+    font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ink); background:var(--surface-2);
+    border:1px solid var(--rule-strong); border-radius:0;
+    padding:.45rem .85rem; cursor:pointer;
+    min-height:44px; touch-action:manipulation;
+  }
+  .btn:hover{border-color:var(--accent)}
+  .btn:active{transform:scale(.97); background:var(--accent-soft)}
+  .btn:disabled{opacity:.45; cursor:not-allowed; transform:none}
+  .btn[aria-pressed="true"]{background:var(--accent); color:var(--surface); border-color:var(--accent)}
+  .btn.primary{background:var(--accent); color:var(--surface); border-color:var(--accent)}
+  @media (prefers-reduced-motion: no-preference){ .btn{transition:transform 100ms ease-out} }
+  .hash-out{
+    display:block; font-family:"IBM Plex Mono", monospace;
+    font-size:clamp(.82rem,2.6vw,1rem); line-height:1.75; letter-spacing:.04em;
+    overflow-wrap:anywhere; color:var(--ink);
+  }
+  .hash-out .flip{background:var(--flip); border-radius:1px}
+  .lab .count{color:var(--accent); font-weight:500}
+
+  /* ---------- miner ---------- */
+  .miner{
+    background:var(--surface); border:1px solid var(--rule-strong);
+    padding:clamp(1rem,3vw,1.5rem);
+    display:flex; flex-direction:column; gap:.8rem;
+  }
+  .miner-top{display:flex; flex-wrap:wrap; gap:.6rem 1rem; justify-content:space-between; align-items:center}
+  .miner-top b{font-family:"IBM Plex Mono", monospace; color:var(--ink); letter-spacing:.06em}
+  .seg{display:flex; gap:.35rem; align-items:center; flex-wrap:wrap}
+  .mine-hash{
+    display:block; font-family:"IBM Plex Mono", monospace;
+    font-size:clamp(.8rem,2.5vw,.98rem); letter-spacing:.04em;
+    overflow-wrap:anywhere; color:var(--ink-soft);
+    border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    padding-block:.7rem; min-height:3.4rem;
+  }
+  .mine-hash .hit{color:var(--valid); font-weight:600}
+  .mine-hash.found{color:var(--ink)}
+  .mine-stats{display:flex; flex-wrap:wrap; gap:.6rem 2rem}
+  .mine-stats div{display:flex; flex-direction:column}
+  .mine-stats .n{
+    font-family:"IBM Plex Mono", monospace; font-size:1.25rem; font-weight:600;
+    color:var(--ink); font-variant-numeric:tabular-nums; line-height:1.2;
+  }
+  .mine-stats .l{
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .meter{height:3px; background:var(--surface-2); border:0; overflow:hidden}
+  .meter i{display:block; height:100%; width:0; background:var(--accent)}
+  .meter.over i{background:var(--invalid)}
+  .miner .hint, .chainlab .hint{font-size:.9rem; color:var(--ink-soft); margin:0; letter-spacing:var(--track-small)}
+  .seg{gap:.5rem}
+  .mine-input{
+    font-family:"IBM Plex Mono", monospace; font-size:.85rem; overflow-wrap:anywhere;
+    background:var(--paper); border:1px dashed var(--rule-strong); padding:.5rem .7rem;
+  }
+  .mine-input b{color:var(--accent); font-weight:600; font-variant-numeric:tabular-nums}
+  .runs{font-family:"IBM Plex Mono", monospace; font-size:.8rem; color:var(--ink-soft); margin:0; max-width:none}
+  .runs b{color:var(--ink); font-weight:600}
+
+  /* ---------- tamper lab (interactive chain) ---------- */
+  .chainlab{
+    background:var(--surface); border:1px solid var(--rule-strong);
+    padding:clamp(.8rem,2.5vw,1.2rem); display:flex; flex-direction:column; gap:.9rem;
+  }
+  .blocks{list-style:none; margin:0; padding:0; display:grid; gap:.6rem; grid-template-columns:repeat(auto-fit,minmax(11.5rem,1fr))}
+  .blk{
+    background:var(--surface-2); border:1px solid var(--rule-strong); border-top:3px solid var(--valid);
+    padding:.6rem .7rem .7rem; display:flex; flex-direction:column; gap:.45rem; min-width:0;
+  }
+  .blk.broken{background:var(--invalid-soft); border-color:var(--invalid)}
+  .blk.mining{border-top-color:var(--accent)}
+  .blk-head{display:flex; justify-content:space-between; align-items:baseline; gap:.5rem}
+  .blk-head b{font-family:"IBM Plex Mono", monospace; font-size:.8rem; letter-spacing:.08em}
+  .blk .state{font-family:"IBM Plex Mono", monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--valid)}
+  .blk.broken .state{color:var(--invalid); font-weight:600}
+  .blk.mining .state{color:var(--accent); font-weight:600}
+  .pay{display:flex; flex-wrap:wrap; align-items:center; gap:.3rem .4rem; font-size:.95rem; font-weight:500; min-height:44px}
+  .pay .unit{font-family:"IBM Plex Mono", monospace; font-size:.8rem; color:var(--ink-soft)}
+  .amt{
+    width:5.4rem; min-height:40px; padding:.3rem .45rem;
+    font:600 1rem "IBM Plex Mono", monospace; text-align:right; color:var(--ink);
+    background:var(--surface); border:1px solid var(--accent); border-radius:0;
+    box-shadow:inset 0 -2px 0 var(--accent); cursor:text;
+  }
+  .amt:hover{background:var(--accent-soft)}
+  .amt:focus{outline:2px solid var(--accent); outline-offset:1px}
+  .amt:disabled{opacity:.6; cursor:not-allowed}
+  .blk.edited .amt{border-color:var(--invalid); box-shadow:inset 0 -2px 0 var(--invalid); color:var(--invalid)}
+  .blk .kv{display:grid; grid-template-columns:3.6rem minmax(0,1fr); gap:.4rem; align-items:baseline}
+  .blk .kv span{font-family:"IBM Plex Mono", monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft)}
+  .blk code{font-family:"IBM Plex Mono", monospace; font-size:.8rem; overflow-wrap:anywhere; font-variant-numeric:tabular-nums}
+  .blk code .z{color:var(--valid); font-weight:600}
+  .blk.broken .hash, .blk .prev.changed{color:var(--invalid)}
+  .blk .prev.changed{font-weight:600}
+
+  /* the lab's instruction line, which walks through tamper → damage → cover-up */
+  .chain-prompt{
+    display:flex; flex-wrap:wrap; gap:.7rem 1.2rem; align-items:center; justify-content:space-between;
+    padding-bottom:.9rem; border-bottom:1px solid var(--rule);
+  }
+  .chain-prompt > div{flex:1 1 22rem; display:flex; flex-direction:column; gap:.25rem}
+  .chain-step{font-family:"IBM Plex Mono", monospace; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600}
+  .chain-prompt[data-state="broken"] .chain-step{color:var(--invalid)}
+  .chain-prompt[data-state="repaired"] .chain-step{color:var(--valid)}
+  .chain-prompt p{margin:0; font-size:.98rem; max-width:62ch}
+  .chain-prompt .btn{flex:0 0 auto}
+  .chain-prompt[data-state="broken"] .btn.primary{background:var(--invalid); border-color:var(--invalid)}
+  .chain-foot{display:flex; justify-content:flex-end}
+
+  /* ---------- progressive disclosure ---------- */
+  details.deeper{border:1px solid var(--rule-strong); background:var(--surface)}
+  details.deeper > summary{
+    cursor:pointer; padding:.8rem 1rem; min-height:44px;
+    font-weight:600; font-size:.98rem; list-style-position:inside;
+  }
+  details.deeper > summary:hover{background:var(--surface-2)}
+  details.deeper[open] > summary{border-bottom:1px solid var(--rule)}
+  details.deeper > figure{padding:clamp(.6rem,2vw,1rem)}
+
+  /* ---------- quiz ---------- */
+  .quiz{list-style:none; margin:0; padding:0; counter-reset:q; display:flex; flex-direction:column; gap:1rem}
+  .quiz > li{counter-increment:q; background:var(--surface); border:1px solid var(--rule-strong); padding:clamp(.9rem,2.5vw,1.2rem)}
+  .quiz h3{font-size:1.02rem; margin-bottom:.7rem}
+  .quiz h3::before{content:"Q" counter(q) "  "; font-family:"IBM Plex Mono", monospace; color:var(--accent); white-space:pre}
+  .opts{display:flex; flex-direction:column; gap:.5rem}
+  .opt{
+    text-align:left; font:inherit; font-size:.96rem; color:var(--ink); cursor:pointer;
+    background:var(--surface-2); border:1px solid var(--rule-strong); border-radius:0;
+    padding:.6rem .8rem; min-height:44px; touch-action:manipulation;
+  }
+  .opt:hover{border-color:var(--accent)}
+  .opt.right{background:var(--valid); border-color:var(--valid); color:var(--surface)}
+  .opt.wrong{background:var(--invalid-soft); border-color:var(--invalid); color:var(--invalid); text-decoration:line-through}
+  .opt.right::after{content:"  ✓ correct"; font-weight:600}
+  .quiz .why{margin:.7rem 0 0; font-size:.94rem; color:var(--ink-soft)}
+  .quiz .why b{color:var(--ink)}
+  .score{font-family:"IBM Plex Mono", monospace; font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-soft); margin:0}
+  @media (prefers-reduced-motion: no-preference){
+    .opt, .blk{transition:background-color 180ms ease-out, border-color 180ms ease-out}
+  }
+
+  /* ---------- scrollable regions ---------- */
+  .scroller{overflow-x:auto}
+  .scroller.fade-end{
+    -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 44px),transparent);
+    mask-image:linear-gradient(to right,#000 calc(100% - 44px),transparent);
+  }
+  .scroller.fade-start{
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 44px);
+    mask-image:linear-gradient(to right,transparent,#000 44px);
+  }
+  .scroller.fade-start.fade-end{
+    -webkit-mask-image:linear-gradient(to right,transparent,#000 44px,#000 calc(100% - 44px),transparent);
+    mask-image:linear-gradient(to right,transparent,#000 44px,#000 calc(100% - 44px),transparent);
+  }
+
+  /* ---------- figures ---------- */
+  figure{margin:0; display:flex; flex-direction:column; gap:.7rem}
+  .figbox{background:var(--surface); border:1px solid var(--rule-strong); padding:clamp(.6rem,2vw,1rem)}
+  figure svg{display:block; width:100%; min-width:560px; max-width:100%; height:auto; color:var(--ink)}
+  figcaption{font-size:.9rem; color:var(--ink-soft); max-width:62ch}
+  figcaption b{color:var(--ink); font-weight:600}
+
+  .svg-card{fill:var(--surface-2); stroke:var(--rule-strong); stroke-width:1}
+  .svg-head{fill:var(--accent-soft); stroke:var(--rule-strong); stroke-width:1}
+  .svg-label{font-family:"IBM Plex Mono", monospace; font-size:9.5px; letter-spacing:.09em; fill:var(--ink-soft)}
+  .svg-val{font-family:"IBM Plex Mono", monospace; font-size:11px; fill:var(--ink)}
+  .svg-title{font-family:"IBM Plex Mono", monospace; font-size:11px; font-weight:600; letter-spacing:.06em; fill:var(--ink)}
+  .svg-link{fill:none; stroke:var(--ink-soft); stroke-width:1.4}
+  .svg-note{font-family:"IBM Plex Mono", monospace; font-size:10px; letter-spacing:.06em; fill:var(--ink-soft)}
+  .bad .svg-card{fill:var(--invalid-soft); stroke:var(--invalid)}
+  .bad .svg-head{fill:var(--invalid-soft); stroke:var(--invalid)}
+  .bad .svg-val, .bad .svg-title{fill:var(--invalid)}
+  .svg-broken{fill:none; stroke:var(--invalid); stroke-width:1.6; stroke-dasharray:5 4}
+  .svg-bad-note{font-family:"IBM Plex Mono", monospace; font-size:10px; letter-spacing:.06em; fill:var(--invalid); font-weight:500}
+  .svg-ok-note{font-family:"IBM Plex Mono", monospace; font-size:10px; letter-spacing:.06em; fill:var(--valid)}
+  .svg-edge{fill:none; stroke:var(--rule-strong); stroke-width:1.2}
+  .svg-edge-bad{fill:none; stroke:var(--invalid); stroke-width:1.8}
+
+  /* ---------- chart ---------- */
+  .chartwrap{position:relative}
+  .chartbox{background:var(--surface); border:1px solid var(--rule-strong); padding:clamp(.6rem,2vw,1rem)}
+  .chart-grid{stroke:var(--rule); stroke-width:1; fill:none}
+  .chart-axis{stroke:var(--rule-strong); stroke-width:1; fill:none}
+  .chart-tick{font-family:"IBM Plex Mono", monospace; font-size:10px; fill:var(--ink-soft); font-variant-numeric:tabular-nums}
+  .chart-axis-title{font-family:"IBM Plex Mono", monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; fill:var(--ink-soft)}
+  .chart-line{fill:none; stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+  .chart-line.s1{stroke:var(--accent-2)}
+  .chart-line.s2{stroke:var(--accent)}
+  .chart-dot.s1{fill:var(--accent-2)}
+  .chart-dot.s2{fill:var(--accent)}
+  .chart-label{font-family:"IBM Plex Sans", sans-serif; font-size:11px; fill:var(--ink); font-weight:500}
+  .chart-threshold{stroke:var(--ink-soft); stroke-width:1; stroke-dasharray:4 4; fill:none}
+  .chart-cross{stroke:var(--ink-soft); stroke-width:1; fill:none; visibility:hidden}
+  .chart-tip{
+    position:absolute; pointer-events:none; opacity:0;
+    background:var(--ink); color:var(--paper);
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem; line-height:1.55;
+    padding:.4rem .55rem; white-space:nowrap; transform:translate(-50%,-115%);
+    font-variant-numeric:tabular-nums;
+  }
+  .chart-tip.below{transform:translate(-50%,25%)}
+  .chart-tip b{display:block; font-weight:600; letter-spacing:.08em; text-transform:uppercase; font-size:.72rem; opacity:.75}
+  .legend{display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; align-items:center}
+  .legend span{display:flex; align-items:center; gap:.4rem; font-size:.82rem; color:var(--ink-soft)}
+  .legend i{width:14px; height:3px; display:block}
+  .legend i.s1{background:var(--accent-2)}
+  .legend i.s2{background:var(--accent)}
+  details.tableview{border-top:1px solid var(--rule)}
+  details.tableview summary{
+    cursor:pointer; padding-block:.5rem;
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  details.tableview table{min-width:0; font-size:.85rem}
+  details.tableview td, details.tableview th{padding:.35rem .6rem; font-variant-numeric:tabular-nums}
+
+  /* ---------- nodes ---------- */
+  .nodes{display:flex; flex-wrap:wrap; gap:.5rem; padding:0; margin:0; list-style:none}
+  .node{
+    flex:1 1 9.5rem; background:var(--surface); border:1px solid var(--rule-strong);
+    padding:.6rem .7rem; display:flex; flex-direction:column; gap:.2rem;
+  }
+  .node .who{
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .node .tip{font-family:"IBM Plex Mono", monospace; font-size:.8rem; color:var(--ink)}
+  .node .verdict{font-family:"IBM Plex Mono", monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--valid)}
+  .node.out{border-color:var(--invalid); background:var(--invalid-soft)}
+  .node.out .tip, .node.out .verdict{color:var(--invalid)}
+
+  /* ---------- table ---------- */
+  .tablewrap{border:1px solid var(--rule-strong); background:var(--surface)}
+  table{border-collapse:collapse; width:100%; min-width:480px; font-size:.92rem}
+  caption{text-align:left; padding:.7rem .85rem; font-size:.82rem; color:var(--ink-soft); border-bottom:1px solid var(--rule); background:var(--surface-2)}
+  th,td{text-align:left; padding:.7rem .85rem; border-bottom:1px solid var(--rule); vertical-align:top}
+  thead th{
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
+    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft); font-weight:500;
+  }
+  tbody th{font-weight:500; color:var(--ink-soft); font-size:.86rem; width:11rem}
+  tbody tr:nth-child(even){background:var(--surface-2)}
+  tbody tr:last-child th, tbody tr:last-child td{border-bottom:0}
+  td b{font-weight:600}
+
+  /* ---------- steps ---------- */
+  .steps{list-style:none; margin:0; padding:0; counter-reset:step; display:flex; flex-direction:column}
+  .steps li{
+    counter-increment:step; display:grid; grid-template-columns:3rem minmax(0,1fr);
+    gap:.2rem 1rem; padding-block:.95rem; border-bottom:1px solid var(--rule);
+  }
+  .steps li:first-child{border-top:1px solid var(--rule)}
+  .steps li::before{
+    content:"0" counter(step);
+    font-family:"IBM Plex Mono", monospace; font-size:1.1rem; font-weight:600;
+    color:var(--accent); grid-row:span 2; padding-top:.05rem;
+  }
+  .steps p{margin:0; font-size:.96rem; color:var(--ink-soft)}
+
+  /* ---------- verdict columns ---------- */
+  .cols{display:grid; grid-template-columns:repeat(auto-fit, minmax(16rem,1fr)); gap:clamp(1rem,2.5vw,1.6rem)}
+  .col{border-top:2px solid var(--ink); padding-top:.7rem}
+  .col.bad-col{border-top-color:var(--invalid)}
+  .col h3{
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
+    letter-spacing:.14em; text-transform:uppercase; margin-bottom:.6rem;
+  }
+  .col.bad-col h3{color:var(--invalid)}
+  .col ul{margin:0; padding-left:1.05rem; display:flex; flex-direction:column; gap:.55rem}
+  .col li{font-size:.95rem; color:var(--ink-soft)}
+  .col li b{color:var(--ink); font-weight:600}
+
+  .pull{
+    border-left:3px solid var(--accent);
+    padding:.2rem 0 .2rem 1.1rem;
+    font-family:"Fraunces", Georgia, serif; font-weight:500; font-optical-sizing:auto;
+    font-size:clamp(1.15rem,2.6vw,1.5rem); line-height:1.35; max-width:36ch;
+  }
+
+  /* ---------- the closing balance ----------
+     A ledger closes with its total, ruled twice. This is that entry:
+     same grid, same folio, same column rule, set off by the double rule
+     a bookkeeper draws under a final total. */
+  .band{
+    border-top:4px double var(--ink);
+    padding-block:clamp(2.4rem,6vw,4rem);
+  }
+  .band .stack{gap:1.1rem}
+  .band .eyebrow{color:var(--accent)}
+  .band p{
+    font-family:"Fraunces", Georgia, serif; font-weight:500; font-optical-sizing:auto;
+    font-size:clamp(1.7rem,5vw,3.1rem); line-height:1.12; letter-spacing:-.018em;
+    max-width:22ch; margin:0; text-wrap:balance;
+  }
+  .band p em{font-style:normal; color:var(--accent)}
+  .band .dbl{height:4px; max-width:22rem; border-top:1px solid var(--rule-strong); border-bottom:1px solid var(--rule-strong)}
+  .band .sub{
+    font-family:"IBM Plex Sans", sans-serif; font-size:1rem; font-weight:400;
+    line-height:1.6; letter-spacing:var(--track-small); max-width:52ch; color:var(--ink-soft);
+  }
+
+  /* ---------- glossary ---------- */
+  .gloss{margin:0; padding:0; border-top:1px solid var(--rule)}
+  .gloss div{
+    display:grid; grid-template-columns:11rem minmax(0,1fr);
+    gap:.15rem 1.2rem; padding:.7rem; border-bottom:1px solid var(--rule);
+  }
+  .gloss div:nth-child(odd){background:var(--surface-2)}
+  .gloss dt{font-family:"IBM Plex Mono", monospace; font-size:.82rem; font-weight:500; color:var(--accent)}
+  .gloss dd{margin:0; font-size:.93rem; color:var(--ink-soft)}
+  @media (max-width:560px){ .gloss div{grid-template-columns:1fr} }
+
+  footer{
+    border-top:2px solid var(--ink); padding-top:.7rem; margin-top:clamp(2rem,5vw,3rem);
+    display:flex; flex-wrap:wrap; gap:.4rem 1.5rem; justify-content:space-between;
+    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="rule-top">
+      <span class="eyebrow">A plain-language explainer</span>
+      <span class="eyebrow">Ledger · Hash · Chain · Consensus</span>
+    </div>
+    <h1>What is a <em>blockchain?</em></h1>
+    <p class="deck">A <strong>shared record book</strong>. Thousands of strangers keep identical copies, pages are only ever added to the end, and each page carries a fingerprint of the one before it — so altering old history breaks every seal that follows.</p>
+    <ul class="chips">
+      <li class="chip">Shared by everyone</li>
+      <li class="chip">Append-only</li>
+      <li class="chip">Tamper-evident</li>
+    </ul>
+    <nav class="index" aria-label="Contents">
+      <a href="#definition"><span class="n">01</span> Definition</a>
+      <a href="#anatomy"><span class="n">02</span> Inside a block</a>
+      <a href="#fingerprints"><span class="n">03</span> Fingerprints</a>
+      <a href="#chain"><span class="n">04</span> The chain</a>
+      <a href="#decides"><span class="n">05</span> Who decides</a>
+      <a href="#payment"><span class="n">06</span> One payment</a>
+      <a href="#tradeoffs"><span class="n">07</span> Trade-offs</a>
+      <a href="#terms"><span class="n">08</span> Terms</a>
+      <a href="#quiz"><span class="n">09</span> Check yourself</a>
+      <a href="#balance"><span class="n">&mdash;</span> Balance</a>
+    </nav>
+  </header>
+
+  <section class="section" id="definition">
+    <div class="folio">Definition<span>01</span></div>
+    <div class="stack">
+      <div>
+        <h2>Three properties do all the work</h2>
+        <p class="lede">A blockchain is a database with three unusual rules. Everything else — mining, keys, confirmations — exists to defend one of them.</p>
+      </div>
+      <ol class="rows">
+        <li>
+          <div class="k">
+            <svg class="glyph" viewBox="0 0 28 28" aria-hidden="true">
+              <rect x="3" y="7" width="14" height="17"></rect>
+              <path d="M7 4h14v17"></path>
+              <path d="M6.5 12.5h7M6.5 16h7M6.5 19.5h4"></path>
+            </svg>
+            <span class="num">I</span>
+          </div>
+          <div class="v">
+            <h3>Everyone holds a copy</h3>
+            <p>No master server. Each full node stores the whole history and checks new entries itself. Losing one copy loses nothing.</p>
+          </div>
+        </li>
+        <li>
+          <div class="k">
+            <svg class="glyph" viewBox="0 0 28 28" aria-hidden="true">
+              <rect x="4" y="16" width="20" height="5"></rect>
+              <rect x="4" y="9.5" width="20" height="5"></rect>
+              <path d="M14 2v5.5M11.5 5.2 14 7.7l2.5-2.5"></path>
+            </svg>
+            <span class="num">II</span>
+          </div>
+          <div class="v">
+            <h3>You may only add to the end</h3>
+            <p>Entries are grouped into blocks and appended in order. Nothing is edited or deleted — a refund is a new entry, not an erased one.</p>
+          </div>
+        </li>
+        <li>
+          <div class="k">
+            <svg class="glyph" viewBox="0 0 28 28" aria-hidden="true">
+              <path d="M11 9.5 8.5 7a4 4 0 0 0-5.7 5.7l2.5 2.5"></path>
+              <path d="M17 18.5l2.5 2.5a4 4 0 0 0 5.7-5.7l-2.5-2.5"></path>
+              <path d="M12.5 19.5 10 22M15.5 8.5 18 6M9 15.5 5.8 16.7M19 12.5l3.2-1.2"></path>
+            </svg>
+            <span class="num">III</span>
+          </div>
+          <div class="v">
+            <h3>Tampering is obvious</h3>
+            <p>Each block carries a fingerprint of the one before it. Change old history and the fingerprints stop matching, in public, on every copy.</p>
+          </div>
+        </li>
+      </ol>
+      <p class="pull">Not “unhackable.” Tamper-<em>evident</em>: you can still lie, you just can’t do it quietly.</p>
+    </div>
+  </section>
+
+  <section class="section" id="anatomy">
+    <div class="folio">Inside a block<span>02</span></div>
+    <div class="stack">
+      <div>
+        <h2>What one block actually contains</h2>
+        <p>A real entry: the first block of Bitcoin, mined 3 January 2009. A block is mostly bookkeeping — a pointer backwards, a summary of its contents, and proof someone did the work to seal it.</p>
+      </div>
+
+      <div class="record">
+        <div class="record-head">
+          <b>BLOCK 0 · “THE GENESIS BLOCK”</b>
+          <b>2009-01-03 18:15:05 UTC</b>
+        </div>
+        <dl>
+          <div class="fld">
+            <dt>prev_hash</dt>
+            <dd>0000000000000000000000000000000000000000000000000000000000000000
+              <span class="note">All zeros. Nothing sits behind it — the chain starts here.</span>
+            </dd>
+          </div>
+          <div class="fld">
+            <dt>merkle_root</dt>
+            <dd>4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b
+              <span class="note">One hash summarising every transaction. Change any of them and this changes.</span>
+            </dd>
+          </div>
+          <div class="fld">
+            <dt>transactions</dt>
+            <dd>1
+              <span class="note">Its single transaction carries a message: “The Times 03/Jan/2009 Chancellor on brink of second bailout for banks.”</span>
+            </dd>
+          </div>
+          <div class="fld">
+            <dt>nonce</dt>
+            <dd>2083236893
+              <span class="note">A throwaway number. Miners try billions until the block’s hash comes out small enough.</span>
+            </dd>
+          </div>
+          <div class="fld">
+            <dt>hash</dt>
+            <dd><span class="zeros">0000000000</span>19d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f
+              <span class="note">The block’s fingerprint. Those leading zeros are the proof of work — the only way to find them is to guess.</span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <details class="deeper">
+      <summary>Going deeper: how one hash can summarise thousands of transactions</summary>
+      <figure>
+        <div class="figbox scroller" tabindex="0" aria-label="Diagram: how a merkle root is built, scrollable sideways">
+          <svg viewBox="0 0 760 262" role="img" aria-label="A merkle tree: four transactions are hashed in pairs, and those two hashes are hashed together into one merkle root. Editing transaction C changes only the hashes on its path to the root.">
+            <path class="svg-edge" d="M102.5 196 L195 158"></path>
+            <path class="svg-edge" d="M287.5 196 L195 158"></path>
+            <path class="svg-edge-bad" d="M472.5 196 L565 158"></path>
+            <path class="svg-edge" d="M657.5 196 L565 158"></path>
+            <path class="svg-edge" d="M195 124 L380 86"></path>
+            <path class="svg-edge-bad" d="M565 124 L380 86"></path>
+
+            <g>
+              <rect class="svg-card" x="280" y="50" width="200" height="36"></rect>
+              <text class="svg-title" x="380" y="66" text-anchor="middle">MERKLE ROOT</text>
+              <text class="svg-label" x="380" y="78" text-anchor="middle">H( AB + CD )</text>
+            </g>
+
+            <g>
+              <rect class="svg-card" x="105" y="124" width="180" height="34"></rect>
+              <text class="svg-val" x="195" y="145" text-anchor="middle">H( A + B )</text>
+            </g>
+            <g class="bad">
+              <rect class="svg-card" x="475" y="124" width="180" height="34"></rect>
+              <text class="svg-val" x="565" y="145" text-anchor="middle">H( C + D )</text>
+            </g>
+
+            <g>
+              <rect class="svg-card" x="30" y="196" width="145" height="34"></rect>
+              <text class="svg-val" x="102.5" y="217" text-anchor="middle">tx A</text>
+            </g>
+            <g>
+              <rect class="svg-card" x="215" y="196" width="145" height="34"></rect>
+              <text class="svg-val" x="287.5" y="217" text-anchor="middle">tx B</text>
+            </g>
+            <g class="bad">
+              <rect class="svg-card" x="400" y="196" width="145" height="34"></rect>
+              <text class="svg-val" x="472.5" y="217" text-anchor="middle">tx C — edited</text>
+            </g>
+            <g>
+              <rect class="svg-card" x="585" y="196" width="145" height="34"></rect>
+              <text class="svg-val" x="657.5" y="217" text-anchor="middle">tx D</text>
+            </g>
+
+            <text class="svg-note" x="30" y="252">transactions</text>
+            <text class="svg-note" x="30" y="145" text-anchor="start">pair hashes</text>
+            <text class="svg-bad-note" x="730" y="252" text-anchor="end">only this path re-hashes</text>
+          </svg>
+        </div>
+        <figcaption><b>One field commits to everything.</b> Transactions are hashed in pairs, then those hashes are hashed, up to a single root. Edit one transaction and only its path to the root changes — which is also how a phone can prove one payment was included without downloading the other few thousand. (The genesis block has only one transaction, so its root is simply that transaction’s hash.)</figcaption>
+      </figure>
+      </details>
+    </div>
+  </section>
+
+  <section class="section" id="fingerprints">
+    <div class="folio">Fingerprints<span>03</span></div>
+    <div class="stack">
+      <div>
+        <h2>A hash is a fingerprint you can’t run backwards</h2>
+        <p>A hash function turns any input into a fixed-length string. Same input, same result. No practical way to work backwards from the output to the input. And one changed character scrambles the whole output.</p>
+      </div>
+
+      <div class="lab">
+        <label for="hash-input">Input</label>
+        <div class="lab-row">
+          <input id="hash-input" type="text" value="hello" spellcheck="false" autocomplete="off" autocapitalize="off">
+          <button type="button" class="btn" id="hash-reset">Reset to “hello”</button>
+        </div>
+        <div class="flabel"><span>SHA-256 output</span><span class="count" id="flip-count">highlighted: differs from the hash of “Hello”</span></div>
+        <output class="hash-out" id="hash-output" for="hash-input">2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824</output>
+      </div>
+
+      <p>Publish a block’s fingerprint and nobody can quietly swap out what’s inside — anyone can recompute it in microseconds and see.</p>
+    </div>
+  </section>
+
+  <section class="section" id="chain">
+    <div class="folio">The chain<span>04</span></div>
+    <div class="stack">
+      <div>
+        <h2>Why it is a <em>chain</em>, not a list</h2>
+        <p>Every block stores the hash of the block before it. That one field is the chain: each fingerprint depends on the block’s own contents <em>and</em> on all the history behind it.</p>
+      </div>
+
+      <figure>
+        <div class="figbox scroller" tabindex="0" aria-label="Diagram: how blocks link, scrollable sideways">
+          <svg viewBox="0 0 760 252" role="img" aria-label="Three blocks in a row; each block stores the hash of the block before it, so the blocks form a backwards-linked chain.">
+            <defs>
+              <marker id="arw" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+                <polygon points="0,1 10,5 0,9" fill="currentColor"></polygon>
+              </marker>
+            </defs>
+            <g>
+              <rect class="svg-card" x="20" y="30" width="200" height="150"></rect>
+              <rect class="svg-head" x="20" y="30" width="200" height="26"></rect>
+              <text class="svg-title" x="32" y="48">BLOCK 812</text>
+              <text class="svg-label" x="32" y="78">PREV_HASH</text>
+              <text class="svg-val" x="32" y="94">0000…4b71c2</text>
+              <text class="svg-label" x="32" y="126">HASH</text>
+              <text class="svg-val" x="32" y="142">0000…a93f10</text>
+            </g>
+            <g>
+              <rect class="svg-card" x="280" y="30" width="200" height="150"></rect>
+              <rect class="svg-head" x="280" y="30" width="200" height="26"></rect>
+              <text class="svg-title" x="292" y="48">BLOCK 813</text>
+              <text class="svg-label" x="292" y="78">PREV_HASH</text>
+              <text class="svg-val" x="292" y="94">0000…a93f10</text>
+              <text class="svg-label" x="292" y="126">HASH</text>
+              <text class="svg-val" x="292" y="142">0000…7e02dd</text>
+            </g>
+            <g>
+              <rect class="svg-card" x="540" y="30" width="200" height="150"></rect>
+              <rect class="svg-head" x="540" y="30" width="200" height="26"></rect>
+              <text class="svg-title" x="552" y="48">BLOCK 814</text>
+              <text class="svg-label" x="552" y="78">PREV_HASH</text>
+              <text class="svg-val" x="552" y="94">0000…7e02dd</text>
+              <text class="svg-label" x="552" y="126">HASH</text>
+              <text class="svg-val" x="552" y="142">0000…c518a4</text>
+            </g>
+            <path class="svg-link" marker-end="url(#arw)" d="M 380 182 V 208 H 120 V 184"></path>
+            <path class="svg-link" marker-end="url(#arw)" d="M 640 182 V 208 H 380 V 184"></path>
+            <text class="svg-note" x="250" y="228" text-anchor="middle">copies the hash of the block before it</text>
+            <text class="svg-note" x="510" y="228" text-anchor="middle">copies the hash of the block before it</text>
+          </svg>
+        </div>
+        <figcaption><b>The link is one field.</b> Block 813’s <span class="mono">prev_hash</span> is a copy of block 812’s <span class="mono">hash</span> — so verifying the chain is just recomputing hashes and checking each quote.</figcaption>
+      </figure>
+
+      <div>
+        <h3 style="font-size:1.05rem">Now tamper with it yourself</h3>
+        <p>Here is a tiny chain of four real, mined blocks: every hash starts with <span class="mono">0000</span>. You play a cheat trying to rewrite one payment.</p>
+      </div>
+
+      <div class="chainlab" id="chainlab">
+        <div class="chain-prompt" id="chain-prompt" data-state="clean">
+          <div role="status">
+            <span class="chain-step" id="chain-step">Step 1 of 3 · Tamper</span>
+            <p id="chain-status">Change any amount in the boxes below, for example make Ben pay Cai 100 instead of 0.1.</p>
+          </div>
+          <button type="button" class="btn primary" id="chain-action">Do it for me</button>
+        </div>
+        <ol class="blocks" id="blocks" aria-label="A four-block chain with editable amounts"></ol>
+        <div class="chain-foot">
+          <button type="button" class="btn" id="chain-reset">Reset chain</button>
+        </div>
+      </div>
+      <p><b>Rewriting history compounds.</b> The edited block’s fingerprint changes, and because the next block quotes it, <em>that</em> fingerprint changes too, all the way to the end. To make your edit stick you must re-mine every block after it, while the honest network keeps extending the real chain. That race is what “immutable” means.</p>
+    </div>
+  </section>
+
+  <section class="section" id="decides">
+    <div class="folio">Who decides<span>05</span></div>
+    <div class="stack">
+      <div>
+        <h2>Who decides which version is real?</h2>
+        <p>Hashing catches tampering but settles no arguments. When two blocks conflict, the rule is simple: <b>the valid chain with the most accumulated work behind it wins</b>, and nodes reject anything that breaks the rules, whoever sent it.</p>
+      </div>
+
+      <ul class="nodes">
+        <li class="node"><span class="who">Node · Lisbon</span><span class="tip">tip 0000…c518a4</span><span class="verdict">accepted</span></li>
+        <li class="node"><span class="who">Node · Nairobi</span><span class="tip">tip 0000…c518a4</span><span class="verdict">accepted</span></li>
+        <li class="node"><span class="who">Node · Osaka</span><span class="tip">tip 0000…c518a4</span><span class="verdict">accepted</span></li>
+        <li class="node out"><span class="who">Node · rogue</span><span class="tip">tip 9f2c…d10b77</span><span class="verdict">rejected</span></li>
+      </ul>
+      <p>The rogue node isn’t banned. It is ignored — less work behind its chain, hashes that don’t check out, so nobody builds on it.</p>
+
+      <div>
+        <h3 style="font-size:1.05rem">What “work” means — mine a block yourself</h3>
+        <p>There is no clever method. A miner changes the nonce and re-hashes, over and over, until the hash happens to start with enough zeros. Your browser manages somewhere around a hundred thousand guesses a second (watch the counter below). Bitcoin’s whole network makes around 900 million trillion every second, billions of billions of times more.</p>
+      </div>
+
+      <div class="miner" id="miner">
+        <div class="miner-top">
+          <span class="flabel"><span>Target: hash must start with <b id="mine-target">0000</b></span></span>
+          <div class="seg" role="group" aria-label="Difficulty">
+            <button type="button" class="btn" data-zeros="3">3 zeros</button>
+            <button type="button" class="btn" data-zeros="4" aria-pressed="true">4 zeros</button>
+            <button type="button" class="btn" data-zeros="5">5 zeros</button>
+            <button type="button" class="btn primary" id="mine-go">Mine</button>
+          </div>
+        </div>
+        <div>
+          <div class="flabel" style="margin-bottom:.3rem"><span>What’s being hashed</span><span>the nonce is the only part that changes</span></div>
+          <div class="mine-input">block 813 | Ana pays Ben 0.4 | prev 0000a93f10 | nonce <b id="mine-nonce">?</b></div>
+        </div>
+        <output class="mine-hash" id="mine-hash" aria-live="off">Press Mine to start guessing.</output>
+        <div class="mine-stats">
+          <div><span class="n" id="mine-attempts">0</span><span class="l">attempts</span></div>
+          <div><span class="n" id="mine-rate">—</span><span class="l">hashes / sec</span></div>
+          <div><span class="n" id="mine-expected">65,536</span><span class="l">expected attempts</span></div>
+        </div>
+        <div class="meter" id="mine-meter"><i id="mine-fill"></i></div>
+        <p class="hint" id="mine-hint" role="status">Each extra zero makes it 16 times harder. Bitcoin currently needs about 19.</p>
+        <p class="runs" id="mine-runs" hidden></p>
+      </div>
+      <p>Every run starts from a random nonce, so each time you press Mine the answer, and how long it takes, will differ. Run it a few times: some runs finish almost instantly, others take several times the average. That unpredictability is why no miner can “queue up” to win.</p>
+      <p><b>Why would anyone burn electricity on this?</b> The miner who seals a block is paid in newly created bitcoin: 3.125 BTC per block since the April 2024 “halving”. The reward halves roughly every four years, which is why there will never be more than 21 million bitcoin. Miners also collect the fees attached to the transactions they include.</p>
+
+      <p>Bitcoin uses this <b>proof of work</b>. Some newer chains use <b>proof of stake</b> instead; Ethereum switched in 2022. Rather than burning electricity, validators lock up coins as a deposit and are picked at random to propose blocks. If they cheat, they lose part or all of that deposit (“slashing”).</p>
+      <p>The security argument is economic, not magical: attacking has to cost more than it pays. Control a majority of mining power or stake and you <em>can</em> rewrite recent blocks — the 51% attack — which is why a chain with few participants is a weak one.</p>
+    </div>
+  </section>
+
+  <section class="section" id="payment">
+    <div class="folio">One payment<span>06</span></div>
+    <div class="stack">
+      <div>
+        <h2>What happens when you send one</h2>
+        <p>Five steps, every time. On Bitcoin the first confirmation takes about ten minutes on average.</p>
+      </div>
+      <ol class="steps">
+        <li>
+          <h3>You sign it</h3>
+          <p>Your private key signs “pay Ana 0.4”. Anyone with your public key can verify it came from you. Lose the key and the funds are gone; there is no reset link.</p>
+        </li>
+        <li>
+          <h3>It is broadcast</h3>
+          <p>The signed transaction spreads node to node. Each node holds it in its mempool, a waiting room for payments not yet in a block.</p>
+        </li>
+        <li>
+          <h3>Someone bundles it</h3>
+          <p>A miner picks transactions (usually the highest-fee ones) and builds a block containing the previous block’s hash.</p>
+        </li>
+        <li>
+          <h3>They seal it</h3>
+          <p>They grind through nonces until the block’s hash hits the target, then broadcast it. Everyone else re-checks every signature and hash before accepting.</p>
+        </li>
+        <li>
+          <h3>Confirmations pile up</h3>
+          <p>Each block built on top makes reversal exponentially less likely. On Bitcoin nothing is ever strictly final; it just becomes absurdly expensive to undo.</p>
+        </li>
+      </ol>
+
+      <figure>
+        <div class="chartwrap">
+          <div class="chartbox scroller" id="chart-box" tabindex="0" role="img"
+               aria-label="Line chart: the probability an attacker reverses your payment falls roughly four-fold with each confirmation. With 10% of the network's power it drops from 20% after one block to 0.02% after six; with 30% it is still 13% after six and needs 29 blocks to reach the same safety.">
+            <svg viewBox="0 0 760 344" id="chart-svg"></svg>
+          </div>
+          <div class="chart-tip" id="chart-tip"></div>
+        </div>
+        <div class="legend">
+          <span><i class="s1"></i> Attacker holds 10% of the power</span>
+          <span><i class="s2"></i> Attacker holds 30%</span>
+        </div>
+        <figcaption><b>Why six blocks.</b> Satoshi Nakamoto’s original paper computes the odds an attacker catches up from <span class="mono">z</span> blocks behind. Against a 10% attacker, six confirmations put reversal at about 1 in 4,000 — which is roughly where the six-block habit comes from. Against a 30% attacker, reaching that same odds takes 29 blocks, nearly five hours of waiting.</figcaption>
+        <details class="tableview">
+          <summary>Table view</summary>
+          <div class="scroller" tabindex="0" aria-label="Table of chart values">
+            <table id="chart-table"></table>
+          </div>
+        </details>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="tradeoffs">
+    <div class="folio">Trade-offs<span>07</span></div>
+    <div class="stack">
+      <div>
+        <h2>Bought at a real price</h2>
+        <p>Every property above costs speed, storage and privacy. A blockchain is a deliberately inefficient database: thousands of machines redo the same work and every full node stores every byte forever. That redundancy <em>is</em> the product.</p>
+      </div>
+      <div class="cols">
+        <div class="col">
+          <h3>Worth it when</h3>
+          <ul>
+            <li><b>Nobody can be the operator.</b> Parties who distrust each other still need one agreed record.</li>
+            <li><b>The audit trail is the point.</b> Anyone can verify the whole history from scratch.</li>
+            <li><b>Censorship is the threat.</b> No single party to pressure or shut down.</li>
+          </ul>
+        </div>
+        <div class="col bad-col">
+          <h3>Not worth it when</h3>
+          <ul>
+            <li><b>Throughput matters.</b> Bitcoin settles roughly 3–7 transactions a second; card networks can handle tens of thousands.</li>
+            <li><b>Data is private.</b> Public chains publish everything, permanently.</li>
+            <li><b>Mistakes need fixing.</b> No undo, no support line, no chargeback.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="terms">
+    <div class="folio">Terms<span>08</span></div>
+    <div class="stack">
+      <h2>The words you’ll keep hearing</h2>
+      <dl class="gloss">
+        <div><dt>hash</dt><dd>A fixed-length fingerprint of any data. Easy to compute, practically impossible to reverse, wildly different after the smallest change.</dd></div>
+        <div><dt>full node</dt><dd>A computer holding the whole chain and checking every rule itself.</dd></div>
+        <div><dt>nonce</dt><dd>A disposable number miners vary until the block hash falls below the target.</dd></div>
+        <div><dt>merkle root</dt><dd>One hash summarising every transaction in a block.</dd></div>
+        <div><dt>mempool</dt><dd>Each node’s waiting room of broadcast but unconfirmed transactions.</dd></div>
+        <div><dt>fork</dt><dd>Two valid chains competing. Short ones resolve automatically; permanent ones are rule changes the community split over.</dd></div>
+        <div><dt>51% attack</dt><dd>Controlling a majority of mining power or stake — enough to reorder or censor recent blocks, never to forge signatures.</dd></div>
+        <div><dt>block reward</dt><dd>The new bitcoin a miner earns for sealing a block: 3.125 BTC today, halving roughly every four years.</dd></div>
+        <div><dt>confirmation</dt><dd>Each block added on top of the one holding your payment. More confirmations, safer payment.</dd></div>
+        <div><dt>private key</dt><dd>The secret that authorises spending. Whoever holds it controls the funds.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section" id="quiz">
+    <div class="folio">Check yourself<span>09</span></div>
+    <div class="stack">
+      <div>
+        <h2>Four questions</h2>
+        <p>Tap an answer. Wrong answers explain themselves; keep going until you hit the right one.</p>
+      </div>
+      <ol class="quiz" id="quiz-list">
+        <li data-answer="1">
+          <h3>Someone edits one payment in a block from last year. What happens?</h3>
+          <div class="opts">
+            <button type="button" class="opt">Nothing. Old blocks are locked and can’t be edited.</button>
+            <button type="button" class="opt">That block’s hash changes, which breaks the link to every block after it.</button>
+            <button type="button" class="opt">The network quietly repairs it overnight.</button>
+          </div>
+          <p class="why" hidden aria-live="polite"><b>Right.</b> Anyone <em>can</em> edit their own copy. The edit just shows, because every later block quotes the old fingerprint. You saw this in the tamper lab.</p>
+        </li>
+        <li data-answer="2">
+          <h3>At 4 zeros your mining run took 150,000 guesses. Your friend’s took 9,000. Who did it wrong?</h3>
+          <div class="opts">
+            <button type="button" class="opt">You. Your computer must be slow.</button>
+            <button type="button" class="opt">Your friend. That’s suspiciously lucky.</button>
+            <button type="button" class="opt">Neither. Each guess is a fresh lottery ticket.</button>
+          </div>
+          <p class="why" hidden aria-live="polite"><b>Right.</b> 65,536 guesses is only the <em>average</em>. Every hash is equally likely to win, so short and long runs are both normal.</p>
+        </li>
+        <li data-answer="1">
+          <h3>Why do people selling something big often wait for six confirmations?</h3>
+          <div class="opts">
+            <button type="button" class="opt">Bitcoin’s rules forbid spending coins until six blocks pass.</button>
+            <button type="button" class="opt">Each block on top makes reversing the payment far less likely.</button>
+            <button type="button" class="opt">The money takes six blocks to physically arrive.</button>
+          </div>
+          <p class="why" hidden aria-live="polite"><b>Right.</b> Six is a habit, not a rule. Against an attacker with 10% of the power, six blocks put reversal at about 1 in 4,000.</p>
+        </li>
+        <li data-answer="2">
+          <h3>An attacker controls 51% of all mining power. Which one can they <em>not</em> do?</h3>
+          <div class="opts">
+            <button type="button" class="opt">Reverse their own recent payments.</button>
+            <button type="button" class="opt">Refuse to include certain people’s transactions.</button>
+            <button type="button" class="opt">Spend bitcoin from your wallet without your private key.</button>
+          </div>
+          <p class="why" hidden aria-live="polite"><b>Right.</b> Mining power can reorder recent history, but it can’t forge your signature. Only your private key can do that.</p>
+        </li>
+      </ol>
+      <p class="score" id="quiz-score" role="status"></p>
+    </div>
+  </section>
+
+  <section class="section band" id="balance">
+    <div class="folio">Balance<span>&mdash;</span></div>
+    <div class="stack">
+      <span class="eyebrow">The whole argument, in one line</span>
+      <p>If you trust the operator, use a <em>database</em>.</p>
+      <div class="dbl"></div>
+      <p class="sub">A blockchain is what you build when nobody will agree on who the operator should be — and every cost on this page is the bill for that one disagreement.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>Block data: Bitcoin block 0, mined 2009-01-03</span>
+    <span>Reversal odds: Nakamoto 2008, §11</span>
+    <span>Network hashrate ≈ 900 EH/s, Sept 2026</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ================= SHA-256, inline so the page works offline ================= */
+  var sha256 = (function () {
+    var K = new Uint32Array([0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2]);
+    var W = new Uint32Array(64), H = new Uint32Array(8), HEX = [];
+    for (var i = 0; i < 256; i++) HEX[i] = (i < 16 ? '0' : '') + i.toString(16);
+    var enc = typeof TextEncoder !== 'undefined' ? new TextEncoder() : null;
+    function utf8(s) {
+      if (enc) return enc.encode(s);
+      var b = unescape(encodeURIComponent(s)), a = new Uint8Array(b.length);
+      for (var i = 0; i < b.length; i++) a[i] = b.charCodeAt(i);
+      return a;
+    }
+    return function (str) {
+      var msg = utf8(str), len = msg.length, total = ((len + 9 + 63) >> 6) << 6;
+      var m = new Uint8Array(total); m.set(msg); m[len] = 0x80;
+      var bits = len * 8;
+      m[total - 4] = bits >>> 24; m[total - 3] = bits >>> 16; m[total - 2] = bits >>> 8; m[total - 1] = bits;
+      m[total - 5] = (len / 0x20000000) | 0;
+      H[0]=0x6a09e667;H[1]=0xbb67ae85;H[2]=0x3c6ef372;H[3]=0xa54ff53a;H[4]=0x510e527f;H[5]=0x9b05688c;H[6]=0x1f83d9ab;H[7]=0x5be0cd19;
+      for (var o = 0; o < total; o += 64) {
+        var t, i;
+        for (i = 0; i < 16; i++) W[i] = (m[o+i*4]<<24)|(m[o+i*4+1]<<16)|(m[o+i*4+2]<<8)|m[o+i*4+3];
+        for (i = 16; i < 64; i++) {
+          var x = W[i-15], y = W[i-2];
+          W[i] = (((x>>>7|x<<25)^(x>>>18|x<<14)^(x>>>3)) + W[i-7] + ((y>>>17|y<<15)^(y>>>19|y<<13)^(y>>>10)) + W[i-16]) | 0;
+        }
+        var a=H[0],b=H[1],c=H[2],d=H[3],e=H[4],f=H[5],g=H[6],h=H[7];
+        for (i = 0; i < 64; i++) {
+          var t1 = (h + ((e>>>6|e<<26)^(e>>>11|e<<21)^(e>>>25|e<<7)) + ((e&f)^(~e&g)) + K[i] + W[i]) | 0;
+          var t2 = (((a>>>2|a<<30)^(a>>>13|a<<19)^(a>>>22|a<<10)) + ((a&b)^(a&c)^(b&c))) | 0;
+          h=g; g=f; f=e; e=(d+t1)|0; d=c; c=b; b=a; a=(t1+t2)|0;
+        }
+        H[0]+=a;H[1]+=b;H[2]+=c;H[3]+=d;H[4]+=e;H[5]+=f;H[6]+=g;H[7]+=h;
+      }
+      var s = '';
+      for (i = 0; i < 8; i++) { t = H[i]; s += HEX[t>>>24] + HEX[(t>>>16)&255] + HEX[(t>>>8)&255] + HEX[t&255]; }
+      return s;
+    };
+  })();
+
+  function randomNonce() {
+    if (window.crypto && window.crypto.getRandomValues) return window.crypto.getRandomValues(new Uint32Array(1))[0];
+    return Math.floor(Math.random() * 4294967296);
+  }
+  function fmt(n) { return n.toLocaleString('en-US'); }
+
+  /* ================= hash lab ================= */
+  var HELLO_CAP = '185f8db32271fe25f561a6fc938b2e264306ec304eda518007d1764826381969';
+  var input = document.getElementById('hash-input');
+  var out = document.getElementById('hash-output');
+  var note = document.getElementById('flip-count');
+  var resetBtn = document.getElementById('hash-reset');
+  var prev = HELLO_CAP, prevLabel = 'Hello';
+
+  function shorten(s) {
+    if (s === '') return 'an empty box';
+    return '“' + (s.length > 14 ? s.slice(0, 13) + '…' : s) + '”';
+  }
+  function updateHash() {
+    var value = input.value, hash = sha256(value), frag = '', diff = 0, c;
+    for (var i = 0; i < hash.length; i++) {
+      c = hash.charAt(i);
+      if (c !== prev.charAt(i)) { diff++; frag += '<span class="flip">' + c + '</span>'; }
+      else frag += c;
+    }
+    out.innerHTML = frag;
+    note.textContent = diff + ' of 64 differ from ' + shorten(prevLabel);
+    prev = hash; prevLabel = value;
+  }
+  input.addEventListener('input', updateHash);
+  resetBtn.addEventListener('click', function () {
+    input.value = 'hello'; prev = HELLO_CAP; prevLabel = 'Hello';
+    updateHash(); input.focus();
+  });
+  updateHash();
+
+  /* ================= tamper lab: a four-block chain ================= */
+  /* Nonces pre-mined so each block's hash starts 0000:
+     sha256(number + '|' + prev + '|' + 'Payer pays Payee amount' + '|' + nonce) */
+  var ZERO64 = '0000000000000000000000000000000000000000000000000000000000000000';
+  var CHAIN0 = [
+    { from: 'Ana', to: 'Ben', amt: '0.4',  nonce: 26420 },
+    { from: 'Ben', to: 'Cai', amt: '0.1',  nonce: 134587 },
+    { from: 'Cai', to: 'Dev', amt: '0.25', nonce: 85058 },
+    { from: 'Dev', to: 'Ana', amt: '0.05', nonce: 55994 }
+  ];
+  var CHAIN_ZEROS = '0000';
+  var ORIG_PREV = [], chain = [], blockEls = [], chainMining = false, mineStats = null;
+  var blocksEl = document.getElementById('blocks');
+  var chainPrompt = document.getElementById('chain-prompt');
+  var chainStep = document.getElementById('chain-step');
+  var chainStatus = document.getElementById('chain-status');
+  var chainAction = document.getElementById('chain-action');
+  var chainReset = document.getElementById('chain-reset');
+
+  function payment(b) { return b.from + ' pays ' + b.to + ' ' + b.amt; }
+  function blockHash(i) { return sha256((i + 1) + '|' + chain[i].prev + '|' + payment(chain[i]) + '|' + chain[i].nonce); }
+  function shortHash(h, ok) {
+    var head = h.slice(0, 8), tail = h.slice(-6);
+    if (ok) head = '<span class="z">' + head.slice(0, 4) + '</span>' + head.slice(4);
+    return head + '…' + tail;
+  }
+  function buildChain() {
+    blocksEl.innerHTML = '';
+    blockEls = [];
+    mineStats = null;
+    chain = CHAIN0.map(function (b) { return { from: b.from, to: b.to, amt: b.amt, nonce: b.nonce }; });
+    chain.forEach(function (b, i) {
+      var li = document.createElement('li');
+      li.className = 'blk';
+      li.innerHTML =
+        '<div class="blk-head"><b>BLOCK ' + (i + 1) + '</b><span class="state">valid</span></div>' +
+        '<div class="pay"><span>' + b.from + ' pays ' + b.to + '</span>' +
+        '<input class="amt" id="amt-' + (i + 1) + '" type="text" inputmode="decimal" maxlength="8" spellcheck="false" autocomplete="off">' +
+        '<span class="unit">BTC</span></div>' +
+        '<div class="kv"><span>prev</span><code class="prev"></code></div>' +
+        '<div class="kv"><span>nonce</span><code class="nonce"></code></div>' +
+        '<div class="kv"><span>hash</span><code class="hash"></code></div>';
+      var inp = li.querySelector('.amt');
+      inp.value = b.amt;
+      inp.setAttribute('aria-label', 'Amount ' + b.from + ' pays ' + b.to + ', in bitcoin');
+      inp.addEventListener('input', function () { chain[i].amt = inp.value; mineStats = null; refreshChain(); });
+      blocksEl.appendChild(li);
+      blockEls.push(li);
+    });
+    refreshChain();
+    ORIG_PREV = chain.map(function (b) { return b.prev; });
+    refreshChain();
+  }
+  function recompute() {
+    var p = ZERO64;
+    for (var i = 0; i < chain.length; i++) {
+      chain[i].prev = p;
+      chain[i].hash = blockHash(i);
+      chain[i].ok = chain[i].hash.slice(0, CHAIN_ZEROS.length) === CHAIN_ZEROS;
+      p = chain[i].hash;
+    }
+  }
+  function isOriginal() {
+    return chain.every(function (b, i) { return b.amt === CHAIN0[i].amt && b.nonce === CHAIN0[i].nonce; });
+  }
+  function refreshChain() {
+    recompute();
+    var broken = [], edited = [];
+    for (var i = 0; i < chain.length; i++) {
+      paintBlock(i);
+      if (!chain[i].ok) broken.push(i + 1);
+      if (chain[i].amt !== CHAIN0[i].amt) edited.push(i + 1);
+    }
+    if (chainMining) return;
+    if (broken.length) {
+      var e = edited.length ? edited[0] : broken[0];
+      var after = broken.filter(function (n) { return n > e; });
+      setPrompt('broken', 'Step 2 of 3 · See the damage',
+        'You edited block ' + e + ', so its hash lost its leading zeros. ' +
+        (after.length
+          ? 'Block ' + after[0] + ' stores that hash as its “prev”, so its hash changed too' + (after.length > 1 ? ', and so on to the end' : '') + '. '
+          : '') +
+        'To hide the edit you must redo the proof of work for ' + (broken.length === 1 ? 'that block' : 'all ' + broken.length + ' broken blocks') + '.',
+        'Re-mine ' + broken.length + ' block' + (broken.length === 1 ? '' : 's'));
+    } else if (isOriginal()) {
+      setPrompt('clean', 'Step 1 of 3 · Tamper',
+        'Change any amount in the boxes below, for example make Ben pay Cai 100 instead of 0.1.', 'Do it for me');
+    } else {
+      setPrompt('repaired', 'Step 3 of 3 · Who wins?',
+        (mineStats ? 'Your forged chain is valid again after ' + fmt(mineStats.guesses) + ' guesses (' + (mineStats.ms / 1000).toFixed(1) + ' s). ' : 'Your forged chain is valid. ') +
+        'But these blocks only need 4 zeros. Real Bitcoin blocks need about 19, roughly a billion billion times harder each, and the honest network adds a new one every ten minutes. You can’t catch up, so every node keeps the original.',
+        'Start over');
+    }
+  }
+  function setPrompt(state, step, text, action) {
+    chainPrompt.dataset.state = state;
+    chainStep.textContent = step;
+    chainStatus.textContent = text;
+    chainAction.textContent = action;
+    chainAction.disabled = false;
+  }
+  function paintBlock(i) {
+    var b = chain[i], li = blockEls[i];
+    var edited = b.amt !== CHAIN0[i].amt, linkChanged = !b.ok && ORIG_PREV.length && b.prev !== ORIG_PREV[i];
+    li.classList.toggle('broken', !b.ok);
+    li.classList.toggle('edited', edited);
+    li.querySelector('.state').textContent = b.ok ? 'valid' : edited ? 'edited' : 'broken link';
+    var prevEl = li.querySelector('.prev');
+    prevEl.innerHTML = shortHash(b.prev, b.prev.slice(0, 4) === '0000');
+    prevEl.classList.toggle('changed', !!linkChanged);
+    li.querySelector('.nonce').textContent = fmt(b.nonce);
+    li.querySelector('.hash').innerHTML = shortHash(b.hash, b.ok);
+  }
+  function setChainBusy(busy) {
+    chainMining = busy;
+    blockEls.forEach(function (li) { li.querySelector('.amt').disabled = busy; });
+    chainReset.disabled = busy;
+    chainAction.disabled = busy;
+  }
+  function remineAll() {
+    setChainBusy(true);
+    var total = 0, t0 = performance.now(), i = 0;
+    chainAction.textContent = 'Mining…';
+    function next() {
+      recompute();
+      while (i < chain.length && chain[i].ok) i++;
+      if (i >= chain.length) {
+        mineStats = { guesses: total, ms: performance.now() - t0 };
+        setChainBusy(false);
+        refreshChain();
+        return;
+      }
+      var b = chain[i], li = blockEls[i], h;
+      b.nonce = randomNonce();
+      li.classList.add('mining');
+      li.querySelector('.state').textContent = 'mining…';
+      chainStep.textContent = 'Covering your tracks';
+      (function tick() {
+        var until = performance.now() + 14;
+        while (performance.now() < until) {
+          for (var k = 0; k < 200; k++) {
+            h = blockHash(i); total++;
+            if (h.slice(0, CHAIN_ZEROS.length) === CHAIN_ZEROS) {
+              li.classList.remove('mining');
+              refreshChain();
+              i++;
+              setTimeout(next, 120);
+              return;
+            }
+            b.nonce = (b.nonce + 1) >>> 0;
+          }
+        }
+        chainStatus.textContent = 'Re-mining block ' + (i + 1) + ' of ' + chain.length + ': ' + fmt(total) + ' guesses so far.';
+        li.querySelector('.nonce').textContent = fmt(b.nonce);
+        li.querySelector('.hash').textContent = h.slice(0, 8) + '…' + h.slice(-6);
+        setTimeout(tick, 0);
+      })();
+    }
+    next();
+  }
+  chainAction.addEventListener('click', function () {
+    var state = chainPrompt.dataset.state;
+    if (state === 'clean') {
+      var inp = blockEls[1].querySelector('.amt');
+      inp.value = '100';
+      inp.dispatchEvent(new Event('input'));
+    } else if (state === 'broken') {
+      remineAll();
+    } else {
+      buildChain();
+    }
+  });
+  chainReset.addEventListener('click', buildChain);
+  buildChain();
+
+  /* ================= proof-of-work miner ================= */
+  (function () {
+    var miner = document.getElementById('miner');
+    var BLOCK = 'block 813 | Ana pays Ben 0.4 | prev 0000a93f10 | nonce ';
+    var elHash = document.getElementById('mine-hash');
+    var elNonce = document.getElementById('mine-nonce');
+    var elAttempts = document.getElementById('mine-attempts');
+    var elRate = document.getElementById('mine-rate');
+    var elExpected = document.getElementById('mine-expected');
+    var elFill = document.getElementById('mine-fill');
+    var elMeter = document.getElementById('mine-meter');
+    var elTarget = document.getElementById('mine-target');
+    var elHint = document.getElementById('mine-hint');
+    var elRuns = document.getElementById('mine-runs');
+    var goBtn = document.getElementById('mine-go');
+    var zeroBtns = miner.querySelectorAll('[data-zeros]');
+
+    var zeros = 4, target = '0000', nonce = 0, attempts = 0, running = false, finished = false;
+    var runStart = 0, runAttempts = 0, lastPaint = 0, runs = [];
+    var DEFAULT_HINT = 'Each extra zero makes it 16 times harder. Bitcoin currently needs about 19.';
+
+    function expected() { return Math.pow(16, zeros); }
+
+    function setZeros(z) {
+      zeros = z;
+      target = new Array(z + 1).join('0');
+      elTarget.textContent = target;
+      elExpected.textContent = fmt(expected());
+      for (var i = 0; i < zeroBtns.length; i++) {
+        zeroBtns[i].setAttribute('aria-pressed', String(Number(zeroBtns[i].dataset.zeros) === z));
+      }
+      runs = [];
+      resetMine();
+    }
+    function resetMine() {
+      running = false; finished = false; attempts = 0;
+      nonce = randomNonce();
+      goBtn.textContent = 'Mine';
+      elNonce.textContent = '?';
+      elAttempts.textContent = '0';
+      elRate.textContent = '—';
+      elFill.style.width = '0';
+      elMeter.classList.remove('over');
+      elHash.textContent = 'Press Mine to start guessing.';
+      elHash.className = 'mine-hash';
+      elHint.textContent = DEFAULT_HINT;
+      paintRuns();
+    }
+    function paintRuns() {
+      if (!runs.length) { elRuns.hidden = true; return; }
+      var sum = runs.reduce(function (a, b) { return a + b; }, 0);
+      elRuns.hidden = false;
+      elRuns.innerHTML = 'Your runs: ' + (runs.length > 6 ? '… ' : '') + runs.slice(-6).map(fmt).join(' · ') +
+        '<br>Average of ' + runs.length + ' run' + (runs.length === 1 ? '' : 's') + ': <b>' +
+        fmt(Math.round(sum / runs.length)) + '</b> guesses (expected ' + fmt(expected()) + ')';
+    }
+    function paint(hash, done) {
+      elAttempts.textContent = fmt(attempts);
+      elNonce.textContent = fmt(nonce);
+      var secs = (performance.now() - runStart) / 1000;
+      if (secs > 0.15) elRate.textContent = fmt(Math.round(runAttempts / secs));
+      var ratio = attempts / expected();
+      elFill.style.width = Math.min(ratio, 1) * 100 + '%';
+      elMeter.classList.toggle('over', ratio > 1);
+      if (done) {
+        elHash.className = 'mine-hash found';
+        elHash.innerHTML = '<span class="hit">' + hash.slice(0, zeros) + '</span>' + hash.slice(zeros);
+        var luck = ratio < 0.5 ? 'A lucky run.' : ratio > 2 ? 'An unlucky run.' : 'About average.';
+        elHint.textContent = 'Found after ' + fmt(attempts) + ' guesses. ' + luck + ' The average is '
+          + fmt(expected()) + ', but it is a lottery, not a queue.';
+      } else {
+        elHash.textContent = hash;
+      }
+    }
+    function step() {
+      if (!running) return;
+      var found = null, h, until = performance.now() + 14;
+      outer:
+      while (performance.now() < until) {
+        for (var i = 0; i < 250; i++) {
+          h = sha256(BLOCK + nonce);
+          attempts++; runAttempts++;
+          if (h.slice(0, zeros) === target) { found = h; break outer; }
+          nonce = (nonce + 1) >>> 0;
+        }
+      }
+      if (found) {
+        running = false; finished = true;
+        goBtn.textContent = 'Mine again';
+        runs.push(attempts);
+        paint(found, true);
+        paintRuns();
+        return;
+      }
+      var now = performance.now();
+      if (!reduced || now - lastPaint > 250) { paint(h, false); lastPaint = now; }
+      setTimeout(step, 0);
+    }
+    goBtn.addEventListener('click', function () {
+      if (running) { running = false; goBtn.textContent = 'Resume'; return; }
+      if (finished) { finished = false; attempts = 0; nonce = randomNonce(); }
+      running = true; runStart = performance.now(); runAttempts = 0; lastPaint = 0;
+      goBtn.textContent = 'Stop';
+      elHash.className = 'mine-hash';
+      elHint.textContent = DEFAULT_HINT;
+      setTimeout(step, 0);
+    });
+    for (var b = 0; b < zeroBtns.length; b++) {
+      zeroBtns[b].addEventListener('click', function () { setZeros(Number(this.dataset.zeros)); });
+    }
+    setZeros(4);
+  })();
+
+  /* ================= reversal-odds chart ================= */
+  /* Nakamoto 2008, §11: probability an attacker holding q of the power
+     ever catches up from z blocks behind. */
+  function attackerWins(q, z) {
+    var p = 1 - q, lambda = z * (q / p), sum = 1, poisson, k, i;
+    for (k = 0; k <= z; k++) {
+      poisson = Math.exp(-lambda);
+      for (i = 1; i <= k; i++) poisson *= lambda / i;
+      sum -= poisson * (1 - Math.pow(q / p, z - k));
+    }
+    return sum;
+  }
+
+  var svg = document.getElementById('chart-svg');
+  var NS = 'http://www.w3.org/2000/svg';
+  var X0 = 62, X1 = 612, Y0 = 26, Y1 = 266, ZMAX = 12, FLOOR = -6;
+
+  function xs(z) { return X0 + (z / ZMAX) * (X1 - X0); }
+  function ys(p) {
+    var e = Math.max(Math.log(p) / Math.LN10, FLOOR);
+    return Y0 + (-e / -FLOOR) * (Y1 - Y0);
+  }
+  function el(name, attrs, text) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    svg.appendChild(n);
+    return n;
+  }
+  function pct(v) {
+    if (v >= 0.01) return (v * 100).toFixed(1) + '%';
+    if (v >= 0.0001) return (v * 100).toFixed(3) + '%';
+    return '1 in ' + Math.round(1 / v).toLocaleString('en-US');
+  }
+
+  var seriesA = [], seriesB = [], z;
+  for (z = 0; z <= ZMAX; z++) {
+    seriesA.push(attackerWins(0.10, z));
+    seriesB.push(attackerWins(0.30, z));
+  }
+
+  var decadeLabels = ['100%', '10%', '1%', '0.1%', '0.01%', '0.001%', '0.0001%'];
+  for (var d = 0; d <= 6; d++) {
+    var y = Y0 + (d / 6) * (Y1 - Y0);
+    el('line', { x1: X0, y1: y, x2: X1, y2: y, 'class': 'chart-grid' });
+    el('text', { x: X0 - 10, y: y + 3.5, 'text-anchor': 'end', 'class': 'chart-tick' }, decadeLabels[d]);
+  }
+  el('line', { x1: X0, y1: Y0, x2: X0, y2: Y1, 'class': 'chart-axis' });
+  el('line', { x1: X0, y1: Y1, x2: X1, y2: Y1, 'class': 'chart-axis' });
+  for (z = 0; z <= ZMAX; z += 2) {
+    el('text', { x: xs(z), y: Y1 + 18, 'text-anchor': 'middle', 'class': 'chart-tick' }, z);
+  }
+  el('text', { x: (X0 + X1) / 2, y: Y1 + 42, 'text-anchor': 'middle', 'class': 'chart-axis-title' }, 'Confirmations deep');
+  el('text', { x: X0 - 50, y: Y0 - 10, 'class': 'chart-axis-title' }, 'Odds of reversal');
+
+  el('line', { x1: xs(6), y1: Y0, x2: xs(6), y2: Y1, 'class': 'chart-threshold' });
+  el('text', { x: xs(6) + 6, y: Y0 + 12, 'class': 'chart-tick' }, 'six confirmations');
+
+  function path(data, cls) {
+    var dstr = '', i;
+    for (i = 0; i < data.length; i++) {
+      if (data[i] < Math.pow(10, FLOOR)) break;
+      dstr += (i === 0 ? 'M' : 'L') + xs(i).toFixed(1) + ' ' + ys(data[i]).toFixed(1);
+    }
+    el('path', { d: dstr, 'class': 'chart-line ' + cls });
+    return i - 1;
+  }
+  var lastA = path(seriesA, 's1');
+  var lastB = path(seriesB, 's2');
+
+  el('circle', { cx: xs(6), cy: ys(seriesA[6]), r: 4.5, 'class': 'chart-dot s1' });
+  el('circle', { cx: xs(6), cy: ys(seriesB[6]), r: 4.5, 'class': 'chart-dot s2' });
+  el('text', { x: xs(lastA) + 9, y: ys(seriesA[lastA]) - 10, 'class': 'chart-label' }, '10% attacker');
+  el('text', { x: xs(lastB) + 10, y: ys(seriesB[lastB]) + 4, 'class': 'chart-label' }, '30% attacker');
+
+  var cross = el('line', { x1: 0, y1: Y0, x2: 0, y2: Y1, 'class': 'chart-cross' });
+  var hit = el('rect', { x: X0, y: Y0, width: X1 - X0, height: Y1 - Y0, fill: 'transparent' });
+  var tip = document.getElementById('chart-tip');
+  var box = document.getElementById('chart-box');
+
+  function showAt(zi) {
+    zi = Math.max(0, Math.min(ZMAX, zi));
+    var px = xs(zi);
+    cross.setAttribute('x1', px); cross.setAttribute('x2', px);
+    cross.style.visibility = 'visible';
+    tip.innerHTML = '<b>' + zi + ' confirmation' + (zi === 1 ? '' : 's') + '</b>'
+      + '10% attacker &nbsp;' + pct(seriesA[zi]) + '<br>30% attacker &nbsp;' + pct(seriesB[zi]);
+    var rect = svg.getBoundingClientRect();
+    var scale = rect.width / 760;
+    var ay = ys(seriesA[zi]);
+    tip.classList.toggle('below', ay < 70);
+    tip.style.left = (svg.offsetLeft + px * scale - box.scrollLeft) + 'px';
+    tip.style.top = (svg.offsetTop + ay * scale) + 'px';
+    tip.style.opacity = '1';
+  }
+  function hide() { cross.style.visibility = 'hidden'; tip.style.opacity = '0'; }
+
+  hit.addEventListener('pointermove', function (e) {
+    var rect = svg.getBoundingClientRect();
+    var vx = (e.clientX - rect.left) / (rect.width / 760);
+    showAt(Math.round((vx - X0) / (X1 - X0) * ZMAX));
+  });
+  hit.addEventListener('pointerleave', hide);
+  var kz = 6;
+  box.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight') { kz = Math.min(ZMAX, kz + 1); showAt(kz); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft') { kz = Math.max(0, kz - 1); showAt(kz); e.preventDefault(); }
+  });
+  box.addEventListener('blur', hide);
+
+  var rows = '<caption>Probability the payment is reversed, by confirmation depth</caption>'
+    + '<thead><tr><th scope="col">Confirmations</th><th scope="col">10% attacker</th><th scope="col">30% attacker</th></tr></thead><tbody>';
+  for (z = 0; z <= ZMAX; z++) {
+    rows += '<tr><th scope="row">' + z + '</th><td>' + pct(seriesA[z]) + '</td><td>' + pct(seriesB[z]) + '</td></tr>';
+  }
+  document.getElementById('chart-table').innerHTML = rows + '</tbody>';
+
+  /* ================= quiz ================= */
+  var quizItems = document.querySelectorAll('#quiz-list > li');
+  var quizScore = document.getElementById('quiz-score');
+  var firstTry = 0, answered = 0;
+  Array.prototype.forEach.call(quizItems, function (li) {
+    var answer = Number(li.dataset.answer), tries = 0, done = false;
+    var opts = li.querySelectorAll('.opt'), why = li.querySelector('.why');
+    Array.prototype.forEach.call(opts, function (btn, idx) {
+      btn.addEventListener('click', function () {
+        if (done || btn.classList.contains('wrong')) return;
+        tries++;
+        if (idx === answer) {
+          done = true; answered++;
+          if (tries === 1) firstTry++;
+          btn.classList.add('right');
+          why.hidden = false;
+          if (answered === quizItems.length) {
+            quizScore.textContent = firstTry + ' of ' + quizItems.length + ' right first time.';
+          }
+        } else {
+          btn.classList.add('wrong');
+          btn.setAttribute('aria-disabled', 'true');
+        }
+      });
+    });
+  });
+
+  /* ================= current-section indicator ================= */
+  if ('IntersectionObserver' in window) {
+    var navLinks = {};
+    Array.prototype.forEach.call(document.querySelectorAll('.index a'), function (a) {
+      navLinks[a.getAttribute('href').slice(1)] = a;
+    });
+    var current = null;
+    function setCurrent(id) {
+      if (id === current || !navLinks[id]) return;
+      if (current && navLinks[current]) navLinks[current].removeAttribute('aria-current');
+      navLinks[id].setAttribute('aria-current', 'true');
+      current = id;
+    }
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) setCurrent(e.target.id); });
+    }, { rootMargin: '-15% 0px -70% 0px' });
+    Array.prototype.forEach.call(document.querySelectorAll('.section[id]'), function (s) { obs.observe(s); });
+  }
+
+  /* ================= scroll edge effects ================= */
+  var scrollers = Array.prototype.slice.call(document.querySelectorAll('.scroller'));
+  function sync(el2) {
+    var max = el2.scrollWidth - el2.clientWidth;
+    el2.classList.toggle('fade-start', max > 2 && el2.scrollLeft > 2);
+    el2.classList.toggle('fade-end', max > 2 && el2.scrollLeft < max - 2);
+  }
+  scrollers.forEach(function (s) {
+    sync(s);
+    s.addEventListener('scroll', function () { sync(s); }, { passive: true });
+  });
+  window.addEventListener('resize', function () { scrollers.forEach(sync); });
+})();
+</script>
+
+</body></html>
