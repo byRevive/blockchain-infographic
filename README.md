@@ -6,6 +6,7 @@ An interactive, plain-language explainer of how Bitcoin's blockchain works, buil
 
 ## What's inside
 
+- **The problem**: a two-click demo of double-spending, with and without a shared ledger
 - **Inside a block**: the real Bitcoin genesis block, field by field
 - **Hash lab**: type anything and watch its SHA-256 fingerprint change
 - **Tamper lab**: edit a payment in a four-block chain, see what breaks, then try to cover your tracks by re-mining

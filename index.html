@@ -398,6 +398,11 @@
   .chain-prompt[data-state="broken"] .btn.primary{background:var(--invalid); border-color:var(--invalid)}
   .chain-foot{display:flex; justify-content:flex-end}
 
+  .ds .blk .msg{margin:0; font-size:.92rem; color:var(--ink-soft); min-height:3.6em}
+  .ds .blk .btn{width:100%}
+  .ds .blk .btn.primary{background:var(--accent); border-color:var(--accent); color:var(--surface)}
+  .ds .seg{align-self:flex-start}
+
   /* ---------- progressive disclosure ---------- */
   details.deeper{border:1px solid var(--rule-strong); background:var(--surface)}
   details.deeper > summary{
@@ -506,21 +511,6 @@
   details.tableview table{min-width:0; font-size:.85rem}
   details.tableview td, details.tableview th{padding:.35rem .6rem; font-variant-numeric:tabular-nums}
 
-  /* ---------- nodes ---------- */
-  .nodes{display:flex; flex-wrap:wrap; gap:.5rem; padding:0; margin:0; list-style:none}
-  .node{
-    flex:1 1 9.5rem; background:var(--surface); border:1px solid var(--rule-strong);
-    padding:.6rem .7rem; display:flex; flex-direction:column; gap:.2rem;
-  }
-  .node .who{
-    font-family:"IBM Plex Mono", monospace; font-size:.72rem;
-    letter-spacing:.12em; text-transform:uppercase; color:var(--ink-soft);
-  }
-  .node .tip{font-family:"IBM Plex Mono", monospace; font-size:.8rem; color:var(--ink)}
-  .node .verdict{font-family:"IBM Plex Mono", monospace; font-size:.72rem; letter-spacing:.1em; text-transform:uppercase; color:var(--valid)}
-  .node.out{border-color:var(--invalid); background:var(--invalid-soft)}
-  .node.out .tip, .node.out .verdict{color:var(--invalid)}
-
   /* ---------- table ---------- */
   .tablewrap{border:1px solid var(--rule-strong); background:var(--surface)}
   table{border-collapse:collapse; width:100%; min-width:480px; font-size:.92rem}
@@ -591,17 +581,6 @@
     line-height:1.6; letter-spacing:var(--track-small); max-width:52ch; color:var(--ink-soft);
   }
 
-  /* ---------- glossary ---------- */
-  .gloss{margin:0; padding:0; border-top:1px solid var(--rule)}
-  .gloss div{
-    display:grid; grid-template-columns:11rem minmax(0,1fr);
-    gap:.15rem 1.2rem; padding:.7rem; border-bottom:1px solid var(--rule);
-  }
-  .gloss div:nth-child(odd){background:var(--surface-2)}
-  .gloss dt{font-family:"IBM Plex Mono", monospace; font-size:.82rem; font-weight:500; color:var(--accent)}
-  .gloss dd{margin:0; font-size:.93rem; color:var(--ink-soft)}
-  @media (max-width:560px){ .gloss div{grid-template-columns:1fr} }
-
   footer{
     border-top:2px solid var(--ink); padding-top:.7rem; margin-top:clamp(2rem,5vw,3rem);
     display:flex; flex-wrap:wrap; gap:.4rem 1.5rem; justify-content:space-between;
@@ -627,21 +606,63 @@
       <li class="chip">Tamper-evident</li>
     </ul>
     <nav class="index" aria-label="Contents">
-      <a href="#definition"><span class="n">01</span> Definition</a>
-      <a href="#anatomy"><span class="n">02</span> Inside a block</a>
-      <a href="#fingerprints"><span class="n">03</span> Fingerprints</a>
-      <a href="#chain"><span class="n">04</span> The chain</a>
-      <a href="#decides"><span class="n">05</span> Who decides</a>
-      <a href="#payment"><span class="n">06</span> One payment</a>
-      <a href="#tradeoffs"><span class="n">07</span> Trade-offs</a>
-      <a href="#terms"><span class="n">08</span> Terms</a>
+      <a href="#problem"><span class="n">01</span> The problem</a>
+      <a href="#definition"><span class="n">02</span> Definition</a>
+      <a href="#anatomy"><span class="n">03</span> Inside a block</a>
+      <a href="#fingerprints"><span class="n">04</span> Fingerprints</a>
+      <a href="#chain"><span class="n">05</span> The chain</a>
+      <a href="#decides"><span class="n">06</span> Who decides</a>
+      <a href="#payment"><span class="n">07</span> One payment</a>
+      <a href="#tradeoffs"><span class="n">08</span> Trade-offs</a>
       <a href="#quiz"><span class="n">09</span> Check yourself</a>
       <a href="#balance"><span class="n">&mdash;</span> Balance</a>
     </nav>
   </header>
 
+  <section class="section" id="problem">
+    <div class="folio">The problem<span>01</span></div>
+    <div class="stack">
+      <div>
+        <h2>Digital money has a copying problem</h2>
+        <p class="lede">A photo can be copied a million times and every copy is as good as the original. That is harmless for photos and fatal for money: if a coin is just a file, you could spend it twice.</p>
+      </div>
+
+      <div class="chainlab ds" id="ds">
+        <div class="seg" role="group" aria-label="Choose a scenario">
+          <button type="button" class="btn" id="ds-none" aria-pressed="true">No ledger</button>
+          <button type="button" class="btn" id="ds-ledger" aria-pressed="false">Shared ledger</button>
+        </div>
+        <div class="chain-prompt" id="ds-prompt" data-state="clean">
+          <div role="status">
+            <span class="chain-step" id="ds-step"></span>
+            <p id="ds-status"></p>
+          </div>
+        </div>
+        <ol class="blocks" aria-label="Two shops and a ledger">
+          <li class="blk" id="ds-a">
+            <div class="blk-head"><b>SHOP A</b><span class="state">waiting</span></div>
+            <p class="msg">No payment yet.</p>
+            <button type="button" class="btn primary">Pay Shop A</button>
+          </li>
+          <li class="blk" id="ds-b">
+            <div class="blk-head"><b>SHOP B</b><span class="state">waiting</span></div>
+            <p class="msg">No payment yet.</p>
+            <button type="button" class="btn primary">Pay Shop B</button>
+          </li>
+          <li class="blk" id="ds-book">
+            <div class="blk-head"><b>LEDGER</b><span class="state">none</span></div>
+            <p class="msg">Nothing records who has spent what.</p>
+          </li>
+        </ol>
+        <div class="chain-foot"><button type="button" class="btn" id="ds-reset">Reset</button></div>
+      </div>
+
+      <p>Banks solve this by keeping the ledger themselves: they check every payment against their own records. Bitcoin, launched in 2009, solves it with no bank at all. Thousands of strangers each keep a copy of the ledger, and the rest of this page shows how they agree on it, and why nobody can quietly rewrite it.</p>
+    </div>
+  </section>
+
   <section class="section" id="definition">
-    <div class="folio">Definition<span>01</span></div>
+    <div class="folio">Definition<span>02</span></div>
     <div class="stack">
       <div>
         <h2>Three properties do all the work</h2>
@@ -696,7 +717,7 @@
   </section>
 
   <section class="section" id="anatomy">
-    <div class="folio">Inside a block<span>02</span></div>
+    <div class="folio">Inside a block<span>03</span></div>
     <div class="stack">
       <div>
         <h2>What one block actually contains</h2>
@@ -798,7 +819,7 @@
   </section>
 
   <section class="section" id="fingerprints">
-    <div class="folio">Fingerprints<span>03</span></div>
+    <div class="folio">Fingerprints<span>04</span></div>
     <div class="stack">
       <div>
         <h2>A hash is a fingerprint you can’t run backwards</h2>
@@ -820,7 +841,7 @@
   </section>
 
   <section class="section" id="chain">
-    <div class="folio">The chain<span>04</span></div>
+    <div class="folio">The chain<span>05</span></div>
     <div class="stack">
       <div>
         <h2>Why it is a <em>chain</em>, not a list</h2>
@@ -894,20 +915,12 @@
   </section>
 
   <section class="section" id="decides">
-    <div class="folio">Who decides<span>05</span></div>
+    <div class="folio">Who decides<span>06</span></div>
     <div class="stack">
       <div>
         <h2>Who decides which version is real?</h2>
         <p>Hashing catches tampering but settles no arguments. When two blocks conflict, the rule is simple: <b>the valid chain with the most accumulated work behind it wins</b>, and nodes reject anything that breaks the rules, whoever sent it.</p>
       </div>
-
-      <ul class="nodes">
-        <li class="node"><span class="who">Node · Lisbon</span><span class="tip">tip 0000…c518a4</span><span class="verdict">accepted</span></li>
-        <li class="node"><span class="who">Node · Nairobi</span><span class="tip">tip 0000…c518a4</span><span class="verdict">accepted</span></li>
-        <li class="node"><span class="who">Node · Osaka</span><span class="tip">tip 0000…c518a4</span><span class="verdict">accepted</span></li>
-        <li class="node out"><span class="who">Node · rogue</span><span class="tip">tip 9f2c…d10b77</span><span class="verdict">rejected</span></li>
-      </ul>
-      <p>The rogue node isn’t banned. It is ignored — less work behind its chain, hashes that don’t check out, so nobody builds on it.</p>
 
       <div>
         <h3 style="font-size:1.05rem">What “work” means — mine a block yourself</h3>
@@ -947,7 +960,7 @@
   </section>
 
   <section class="section" id="payment">
-    <div class="folio">One payment<span>06</span></div>
+    <div class="folio">One payment<span>07</span></div>
     <div class="stack">
       <div>
         <h2>What happens when you send one</h2>
@@ -1000,7 +1013,7 @@
   </section>
 
   <section class="section" id="tradeoffs">
-    <div class="folio">Trade-offs<span>07</span></div>
+    <div class="folio">Trade-offs<span>08</span></div>
     <div class="stack">
       <div>
         <h2>Bought at a real price</h2>
@@ -1024,25 +1037,6 @@
           </ul>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="section" id="terms">
-    <div class="folio">Terms<span>08</span></div>
-    <div class="stack">
-      <h2>The words you’ll keep hearing</h2>
-      <dl class="gloss">
-        <div><dt>hash</dt><dd>A fixed-length fingerprint of any data. Easy to compute, practically impossible to reverse, wildly different after the smallest change.</dd></div>
-        <div><dt>full node</dt><dd>A computer holding the whole chain and checking every rule itself.</dd></div>
-        <div><dt>nonce</dt><dd>A disposable number miners vary until the block hash falls below the target.</dd></div>
-        <div><dt>merkle root</dt><dd>One hash summarising every transaction in a block.</dd></div>
-        <div><dt>mempool</dt><dd>Each node’s waiting room of broadcast but unconfirmed transactions.</dd></div>
-        <div><dt>fork</dt><dd>Two valid chains competing. Short ones resolve automatically; permanent ones are rule changes the community split over.</dd></div>
-        <div><dt>51% attack</dt><dd>Controlling a majority of mining power or stake — enough to reorder or censor recent blocks, never to forge signatures.</dd></div>
-        <div><dt>block reward</dt><dd>The new bitcoin a miner earns for sealing a block: 3.125 BTC today, halving roughly every four years.</dd></div>
-        <div><dt>confirmation</dt><dd>Each block added on top of the one holding your payment. More confirmations, safer payment.</dd></div>
-        <div><dt>private key</dt><dd>The secret that authorises spending. Whoever holds it controls the funds.</dd></div>
-      </dl>
     </div>
   </section>
 
@@ -1596,6 +1590,71 @@
     rows += '<tr><th scope="row">' + z + '</th><td>' + pct(seriesA[z]) + '</td><td>' + pct(seriesB[z]) + '</td></tr>';
   }
   document.getElementById('chart-table').innerHTML = rows + '</tbody>';
+
+  /* ================= double-spend demo ================= */
+  (function () {
+    var root = document.getElementById('ds');
+    var prompt = document.getElementById('ds-prompt');
+    var stepEl = document.getElementById('ds-step');
+    var statusEl = document.getElementById('ds-status');
+    var noneBtn = document.getElementById('ds-none');
+    var ledgerBtn = document.getElementById('ds-ledger');
+    var cards = { A: document.getElementById('ds-a'), B: document.getElementById('ds-b') };
+    var book = document.getElementById('ds-book');
+    var mode = 'none', paid = { A: false, B: false }, owner = null, rejected = null;
+
+    function other(s) { return s === 'A' ? 'B' : 'A'; }
+    function setMode(m) {
+      mode = m;
+      noneBtn.setAttribute('aria-pressed', String(m === 'none'));
+      ledgerBtn.setAttribute('aria-pressed', String(m === 'ledger'));
+      reset();
+    }
+    function reset() {
+      paid = { A: false, B: false }; owner = null; rejected = null;
+      render();
+    }
+    function pay(shop) {
+      if (paid[shop] || rejected === shop) return;
+      if (mode === 'ledger' && owner) { rejected = shop; }
+      else { paid[shop] = true; if (mode === 'ledger') owner = shop; }
+      render();
+    }
+    function setPrompt(state, step, text) {
+      prompt.dataset.state = state; stepEl.textContent = step; statusEl.textContent = text;
+    }
+    function render() {
+      ['A', 'B'].forEach(function (s) {
+        var c = cards[s], st = c.querySelector('.state'), msg = c.querySelector('.msg'), btn = c.querySelector('.btn');
+        var done = paid[s] || rejected === s;
+        c.classList.toggle('broken', rejected === s);
+        btn.disabled = done;
+        if (paid[s]) { st.textContent = 'paid'; msg.textContent = 'Received the coin. Hands over the goods.'; }
+        else if (rejected === s) { st.textContent = 'rejected'; msg.textContent = 'The ledger says this coin already went to Shop ' + other(s) + '. No goods.'; }
+        else { st.textContent = 'waiting'; msg.textContent = 'No payment yet.'; }
+      });
+      var bs = book.querySelector('.state'), bm = book.querySelector('.msg');
+      if (mode === 'none') { bs.textContent = 'none'; bm.textContent = 'Nothing records who has spent what.'; }
+      else { bs.textContent = 'shared'; bm.textContent = owner ? 'Coin → Shop ' + owner + '. Every copy of the ledger says so.' : 'Empty. Every payment gets written here first.'; }
+
+      var label = mode === 'none' ? 'No ledger' : 'Shared ledger';
+      if (mode === 'none') {
+        if (paid.A && paid.B) setPrompt('broken', label + ' · The problem', 'Both shops accepted the same coin. Nothing stopped you, because a digital coin is just data, and data can be copied. This is called double-spending.');
+        else if (paid.A || paid.B) setPrompt('clean', label + ' · Step 2', 'Now pay the other shop with the same coin.');
+        else setPrompt('clean', label + ' · Step 1', 'You hold one digital coin. Pay Shop A with it.');
+      } else {
+        if (rejected) setPrompt('repaired', label + ' · Stopped', 'Rejected. The ledger already showed the coin belonged to Shop ' + owner + '. Keeping that ledger honest with no bank in charge is what a blockchain is for.');
+        else if (owner) setPrompt('clean', label + ' · Step 2', 'Now try paying Shop ' + other(owner) + ' with the same coin.');
+        else setPrompt('clean', label + ' · Step 1', 'Every payment is now checked against a ledger everyone shares. Pay a shop with your coin.');
+      }
+    }
+    cards.A.querySelector('.btn').addEventListener('click', function () { pay('A'); });
+    cards.B.querySelector('.btn').addEventListener('click', function () { pay('B'); });
+    noneBtn.addEventListener('click', function () { setMode('none'); });
+    ledgerBtn.addEventListener('click', function () { setMode('ledger'); });
+    document.getElementById('ds-reset').addEventListener('click', reset);
+    render();
+  })();
 
   /* ================= quiz ================= */
   var quizItems = document.querySelectorAll('#quiz-list > li');
